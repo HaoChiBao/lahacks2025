@@ -31,12 +31,11 @@ export default function MultiplayerPage() {
     setGameModeSelect(true); // move to mode selection
   }
 
-  function handleModeSelect(mode) {
+  function handleModeSelect() {
     if (!tempCode || !playerName) return;
-    setSelectedMode(mode); 
     setCreatedCode(tempCode); // finalize the code
     setGameModeSelect(false); // return to the "waiting for players" room screen
-    navigate(`/multiplayer/room/${tempCode}?name=${encodeURIComponent(playerName)}&mode=${mode}`);
+    navigate(`/multiplayer/room/${tempCode}?name=${encodeURIComponent(playerName)}`);
   }
 
   function copyCode() {
@@ -153,20 +152,7 @@ export default function MultiplayerPage() {
               </TabsContent>
             </Tabs>
           ) : (
-            <Card>
-              <CardHeader>
-                <CardTitle>Select Game Mode</CardTitle>
-                <CardDescription>Choose how you want to play</CardDescription>
-              </CardHeader>
-              <CardContent className="flex flex-col gap-6">
-                <Button onClick={() => handleModeSelect("spot")} size="lg" className="w-full">
-                  Spot the Difference
-                </Button>
-                <Button onClick={() => handleModeSelect("fill")} size="lg" variant="secondary" className="w-full">
-                  Fill in the Blanks
-                </Button>
-              </CardContent>
-            </Card>
+            handleModeSelect()
           )}
         </div>
       </main>

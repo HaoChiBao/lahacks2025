@@ -11,8 +11,8 @@ class SocketRooms {
         return room_id
     }
     
-    createRoom() {
-        const room_id = this.generateRoomId()
+    createRoom(room_id: string | null = null) {
+        if(!room_id) room_id = this.generateRoomId()
         if (!this.rooms[room_id]) {
             this.rooms[room_id] = {
                 mode: 'lobby',
@@ -31,8 +31,9 @@ class SocketRooms {
 
     roomLoop(room_id: string) {
         const loop = setInterval(() => {
-            console.log("Room Loop", room_id)
+            // console.log("Room Loop", room_id)
             const clients = this.rooms[room_id].clients
+            const clientInfo = this.getClientRoomInfo(room_id)
 
             for (const ws in clients) {
                 if (clients[ws].readyState === clients[ws].OPEN) {
@@ -40,6 +41,7 @@ class SocketRooms {
                         type: 'gameState',
                         payload: {
                             gameState: this.rooms[room_id].state,
+                            clientInfo,
                         }
                     }))
                 } else {
@@ -47,7 +49,6 @@ class SocketRooms {
                 }
             }
 
-            const clientInfo = this.getClientRoomInfo(room_id)
 
             console.log("Client Info", clientInfo)
 
@@ -86,20 +87,22 @@ class SocketRooms {
     }
     
     joinRoom(room_id: string, ws : any) {
-        if (this.rooms[room_id]) {
-            this.rooms[room_id].clients[ws.id] = ws
-            this.rooms[room_id].state.client_state[ws.id] = {
-                ready: false,
-                score: 0,
-                choices: {
-                    gameMode: 'default',
-                    difficulty: 'default',
-                    language: 'default',
-                }
-            }
-
-            ws.room_id = room_id
+        if (!this.rooms[room_id]) {
+            // create room if it doesn't exist
+            room_id = this.createRoom(room_id)
         }
+        this.rooms[room_id].clients[ws.id] = ws
+        this.rooms[room_id].state.client_state[ws.id] = {
+            ready: false,
+            score: 0,
+            choices: {
+                gameMode: 'default',
+                difficulty: 'default',
+                language: 'default',
+            }
+        }
+
+        ws.room_id = room_id
         return this.rooms[room_id] ? true : false
     }
     

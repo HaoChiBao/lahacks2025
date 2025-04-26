@@ -87,8 +87,75 @@ class Custom_WSS {
                 }
                 break;
 
+            case "roomGameMode":
+                if (ws.room_id) {
+                    const room = this.rooms.rooms[ws.room_id];
+                    if (room) {
+                        room.state.client_state[ws.id].choices.gameMode = payload.gameMode;
+                        this.sendMessage({
+                            type: "roomGameMode",
+                            payload: { room_id: ws.room_id, gameMode: payload.gameMode },
+                        }, ws);
+                    } else {
+                        this.sendMessage({
+                            type: "error",
+                            payload: { message: "Room does not exist" },
+                        }, ws);
+                    }
+                } else {
+                    this.sendMessage({
+                        type: "error",
+                        payload: { message: "Client is not in a room" },
+                    }, ws);
+                }
+                break;
+            case "roomDifficulty": 
+                if (ws.room_id) {
+                    const room = this.rooms.rooms[ws.room_id];
+                    if (room) {
+                        room.state.client_state[ws.id].choices.difficulty = payload.difficulty;
+                        this.sendMessage({
+                            type: "roomDifficulty",
+                            payload: { room_id: ws.room_id, difficulty: payload.difficulty },
+                        }, ws);
+                    } else {
+                        this.sendMessage({
+                            type: "error",
+                            payload: { message: "Room does not exist" },
+                        }, ws);
+                    }
+                } else {
+                    this.sendMessage({
+                        type: "error",
+                        payload: { message: "Client is not in a room" },
+                    }, ws);
+                }
+                break;
+            case "roomLanguage":    
+                if (ws.room_id) {
+                    const room = this.rooms.rooms[ws.room_id];
+                    if (room) {
+                        room.state.client_state[ws.id].choices.language = payload.language;
+                        this.sendMessage({
+                            type: "roomLanguage",
+                            payload: { room_id: ws.room_id, language: payload.language },
+                        }, ws);
+                    } else {
+                        this.sendMessage({
+                            type: "error",
+                            payload: { message: "Room does not exist" },
+                        }, ws);
+                    }
+                } else {
+                    this.sendMessage({
+                        type: "error",
+                        payload: { message: "Client is not in a room" },
+                    }, ws);
+                }
+                break;
+
             case "createRoom":
-                const room_id = this.rooms.createRoom();
+                const room_id = this.rooms.createRoom(null);
                 const join = this.rooms.joinRoom(room_id, ws);
                 if (!join) {
                     this.sendMessage({

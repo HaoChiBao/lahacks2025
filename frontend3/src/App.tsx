@@ -15,6 +15,7 @@ function App() {
         <Route path="/game" element={<Game />} />
         <Route path="/how-to-play" element={<HowToPlayPage />} />
         <Route path="/multiplayer" element={<MultiplayerPage />} />
+        
         <Route path="/gameover" element={<GameOverPage />} /> {/* ⭐ Added this */}
         <Route path="/multiplayer/room/:code" element={<WaitingRoomPage />} /> {/* ✅ this line */}
         
