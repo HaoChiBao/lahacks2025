@@ -31,6 +31,9 @@ class Custom_WSS {
 
             ws.on("close", () => {
                 console.log("Client disconnected");
+                if (ws.room_id) {
+                    this.rooms.leaveRoom(ws.room_id, ws);
+                }
                 delete this.clients[id];
             });
         
@@ -61,6 +64,29 @@ class Custom_WSS {
             case "message":
                 console.log(`Message received: ${payload.text}`);
                 break;
+            case "roomReady":
+                if (ws.room_id) {
+                    const room = this.rooms.rooms[ws.room_id];
+                    if (room) {
+                        room.state.client_state[ws.id].ready = payload.ready;
+                        this.sendMessage({
+                            type: "roomReady",
+                            payload: { room_id: ws.room_id, ready: payload.ready },
+                        }, ws);
+                    } else {
+                        this.sendMessage({
+                            type: "error",
+                            payload: { message: "Room does not exist" },
+                        }, ws);
+                    }
+                } else {
+                    this.sendMessage({
+                        type: "error",
+                        payload: { message: "Client is not in a room" },
+                    }, ws);
+                }
+                break;
+
             case "createRoom":
                 const room_id = this.rooms.createRoom();
                 const join = this.rooms.joinRoom(room_id, ws);
@@ -99,7 +125,7 @@ class Custom_WSS {
                     this.sendMessage({
                         type: "roomLeft",
                         payload: { room_id: payload.room_id },
-                    }, ws);
+                    }, ws); 
                 } else {
                     this.sendMessage({
                         type: "error",
@@ -134,6 +160,14 @@ class Custom_WSS {
                 }, ws);
                 return;
         }
+    }
+
+    getClients(){
+        return this.clients
+    }
+
+    getRooms(){
+        return this.rooms.rooms
     }
 
 }
