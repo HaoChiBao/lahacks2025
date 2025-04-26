@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, Clock, Code2, Heart } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 import { Button } from "../../components/ui/button";
 import { Card, CardContent } from "../../components/ui/card";

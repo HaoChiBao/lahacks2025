@@ -1,5 +1,5 @@
 const main = async () => {
-    const WSS = new WebSocket("ws://localhost:3001");
+    let WSS = new WebSocket("ws://localhost:3001");
 
     const sendMessage = (type, payload) => {
         WSS.send(JSON.stringify({ type, payload }));
