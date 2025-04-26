@@ -2,13 +2,13 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft, Clock, Code2, Heart } from "lucide-react";
 
-import { Button } from "../components/ui/button";
-import { Card, CardContent } from "../components/ui/card";
-import { Tabs, TabsList, TabsTrigger } from "../components/ui/tabs";
-import { Badge } from "../components/ui/badge";
-import { Progress } from "../components/ui/progress";
-import { CodeBlock } from "../components/CodeBlock";
-import { codeSnippets } from "../lib/code-snippets";
+import { Button } from "../../components/ui/button";
+import { Card, CardContent } from "../../components/ui/card";
+import { Tabs, TabsList, TabsTrigger } from "../../components/ui/tabs";
+import { Badge } from "../../components/ui/badge";
+import { Progress } from "../../components/ui/progress";
+import { CodeBlock } from "../../components/ui/CodeBlock";
+import { codeSnippets } from "../../lib/code-snippets";
 
 export default function SpotTheDifference() {
   const [currentLevel, setCurrentLevel] = useState("beginner");

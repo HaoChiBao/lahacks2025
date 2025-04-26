@@ -13,7 +13,10 @@ export default function MultiplayerPage() {
   const [playerName, setPlayerName] = useState("");
   const [roomCode, setRoomCode] = useState("");
   const [createdCode, setCreatedCode] = useState("");
-  const [gameModeSelect, setGameModeSelect] = useState(false); // NEW
+  const [gameModeSelect, setGameModeSelect] = useState(false);
+  const [tempCode, setTempCode] = useState(""); // temporary code before we navigate
+  const [selectedMode, setSelectedMode] = useState(""); // store selected game mode
+
   const navigate = useNavigate();
 
   function handleJoin() {
@@ -24,13 +27,16 @@ export default function MultiplayerPage() {
   function handleCreate() {
     if (!playerName) return;
     const code = generateRoomCode();
-    setCreatedCode(code);
-    setGameModeSelect(true); // NEW: after create, move to pick mode
+    setTempCode(code);
+    setGameModeSelect(true); // move to mode selection
   }
 
   function handleModeSelect(mode) {
-    if (!createdCode || !playerName) return;
-    navigate(`/multiplayer/${mode}/${createdCode}?name=${encodeURIComponent(playerName)}`);
+    if (!tempCode || !playerName) return;
+    setSelectedMode(mode); 
+    setCreatedCode(tempCode); // finalize the code
+    setGameModeSelect(false); // return to the "waiting for players" room screen
+    navigate(`/multiplayer/room/${tempCode}?name=${encodeURIComponent(playerName)}&mode=${mode}`);
   }
 
   function copyCode() {
@@ -38,8 +44,8 @@ export default function MultiplayerPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col">
-      <header className="bg-background border-b">
+    <div className="flex min-h-screen flex-col bg-black text-white">
+      <header className="bg-background border-b border-gray-800">
         <div className="flex h-16 items-center px-4 sm:px-6 lg:px-8">
           <Link to="/" className="mr-4">
             <Button variant="ghost" size="icon">
@@ -136,6 +142,7 @@ export default function MultiplayerPage() {
                     ) : (
                       <Button variant="outline" onClick={() => {
                         setCreatedCode("");
+                        setTempCode("");
                         setGameModeSelect(false);
                       }}>
                         Generate New Code

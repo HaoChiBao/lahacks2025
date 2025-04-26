@@ -19,7 +19,7 @@ export default function HomePage() {
       <main className="flex-1">
         <section className="w-full py-12 md:py-24 lg:py-32">
           <div className="px-4 md:px-6">
-            <div className="flex flex-col items-center justify-center space-y-4 text-center">
+            <div className="flex flex-col items-center justify-center space-y-6 text-center">
               <div className="space-y-2">
                 <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
                   Spot the Code Differences
@@ -28,19 +28,24 @@ export default function HomePage() {
                   Train your debugging skills by spotting differences between incorrect and correct code snippets.
                 </p>
               </div>
-              <div className="w-full max-w-sm space-y-4">
-                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                  <Link to="/game">
-                    <Button size="lg" className="w-full">
-                      Single Player
-                    </Button>
-                  </Link>
-                  <Link to="/multiplayer">
-                    <Button size="lg" className="w-full" variant="secondary">
-                      Multiplayer
-                    </Button>
-                  </Link>
-                </div>
+
+              {/* Updated buttons as boxes */}
+              <div className="flex gap-6 mt-8">
+                <Link
+                  to="/game"
+                  className="border border-gray-700 rounded-lg px-6 py-4 text-lg font-semibold hover:bg-gray-800 hover:text-white transition"
+                >
+                  Single Player
+                </Link>
+                <Link
+                  to="/multiplayer"
+                  className="border border-gray-700 rounded-lg px-6 py-4 text-lg font-semibold hover:bg-gray-800 hover:text-white transition"
+                >
+                  Multiplayer
+                </Link>
+              </div>
+
+              <div className="w-full max-w-sm mt-6">
                 <Link to="/how-to-play">
                   <Button variant="outline" size="lg" className="w-full">
                     How to Play
