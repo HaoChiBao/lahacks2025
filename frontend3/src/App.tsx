@@ -12,6 +12,8 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/game" element={<Game />} />
         <Route path="/how-to-play" element={<HowToPlayPage />} />
+        <Route path="/multiplayer" element={<MultiplayerPage />} />
+        
       </Routes>
     </Router>
   );
