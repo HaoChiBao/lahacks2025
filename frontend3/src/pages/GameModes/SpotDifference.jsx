@@ -79,15 +79,18 @@ export default function SpotTheDifference() {
   };
 
   const handleNextPuzzle = () => {
-    if (currentSnippet + 1 >= 3) {
-      navigate(`/gameover?score=${score}&correct=3&total=3&level=${currentLevel}&mode=single`);
+    if (currentPuzzleIndex + 1 >= maxPuzzles) {
+      // You finished all puzzles → go to GameOver
+      navigate(`/gameover?score=${score}&correct=${correct}&total=${maxPuzzles}&level=${currentLevel}&mode=${mode}`);
     } else {
-      setCurrentSnippet((prev) => (prev + 1) % codeSnippets[currentLevel].length);
+      // Load next puzzle
+      setCurrentPuzzleIndex(currentPuzzleIndex + 1);
       setFoundDifferences([]);
       setShowExplanation(false);
       setTimeLeft(60);
     }
   };
+  
 
   const handleLevelChange = (level) => {
     setCurrentLevel(level);

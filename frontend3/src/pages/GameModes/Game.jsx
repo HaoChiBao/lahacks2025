@@ -1,50 +1,43 @@
 import { useState } from "react";
 import { Button } from "../../components/ui/button";
-import SpotDifference from "./SpotDifference";
-import FillBlanks from "./FillBlanks";
+import SpotTheDifferenceGame from "../../components/SpotTheDifferenceGame"; // ✅ REUSABLE
+//import FillTheBlanksGame from "../../components/FillTheBlanksGame";         // ✅ REUSABLE
 
 export default function Game() {
   const [gameMode, setGameMode] = useState(null);
 
   if (!gameMode) {
     return (
-      <div className="flex min-h-screen flex-col bg-[#f9fafb]">
-        {/* Header */}
-        <header className="bg-background border-b border-gray-200">
-          <div className="flex h-16 items-center justify-center px-4 sm:px-6 lg:px-8">
-            <h1 className="text-lg font-semibold text-gray-800">Select Your Game Mode</h1>
-          </div>
-        </header>
+      <div className="flex min-h-screen flex-col items-center justify-center bg-[#f9fafb] text-gray-800">
+        <h2 className="text-4xl font-extrabold mb-8">Choose Your Game Mode</h2>
 
-        {/* Main */}
-        <main className="flex-1 flex items-center justify-center py-16">
-          <div className="flex flex-wrap justify-center gap-8">
-            {/* Spot the Difference */}
-            <button
-              onClick={() => setGameMode("spot-difference")}
-              className="w-64 h-40 rounded-2xl bg-gray-200 flex items-center justify-center text-xl font-semibold text-gray-700 transition hover:bg-pink-200 hover:text-white hover:scale-105 shadow-md"
-            >
-              Spot the Difference
-            </button>
+        <div className="flex gap-6">
+          <Button
+            onClick={() => setGameMode("spot")}
+            className="rounded-lg bg-gray-200 px-10 py-6 text-lg font-semibold text-gray-700 hover:bg-pink-400 hover:text-white transition"
+          >
+            Spot the Difference
+          </Button>
 
-            {/* Fill in the Blanks */}
-            <button
-              onClick={() => setGameMode("fill-blanks")}
-              className="w-64 h-40 rounded-2xl bg-gray-200 flex items-center justify-center text-xl font-semibold text-gray-700 transition hover:bg-purple-200 hover:text-white hover:scale-105 shadow-md"
-            >
-              Fill in the Blanks
-            </button>
-          </div>
-        </main>
+          <Button
+            onClick={() => setGameMode("fill")}
+            className="rounded-lg bg-gray-200 px-10 py-6 text-lg font-semibold text-gray-700 hover:bg-purple-400 hover:text-white transition"
+          >
+            Fill in the Blanks
+          </Button>
+        </div>
       </div>
     );
   }
 
-  if (gameMode === "spot-difference") {
-    return <SpotDifference />;
+  // 👇 Based on what user clicked, render the actual game component:
+  if (gameMode === "spot") {
+    return <SpotTheDifferenceGame mode="single" />;
   }
 
-  if (gameMode === "fill-blanks") {
-    return <FillBlanks />;
+  if (gameMode === "fill") {
+    return <FillTheBlanksGame mode="single" />;
   }
+
+  return null;
 }
