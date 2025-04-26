@@ -4,6 +4,7 @@ import cors from "cors";
 
 // get routes
 import { example } from "./routers/route-example";
+import { ws_endpoints } from "./routers/ws-endpoints";
 
 // get services
 import { wss } from "./services/websocket";
@@ -23,6 +24,7 @@ app.use(cors({
 
 // use routes
 app.use("/example", example);
+app.use("/ws", ws_endpoints);
 
 app.get("/", (req, res) => {
   res.status(200).json({ status: "im working..." });

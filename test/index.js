@@ -7,6 +7,8 @@ const main = async () => {
 
     WSS.onopen = () => {
         console.log("Connected to server");
+        document.getElementById('connectionStatus').innerText = "Connected";
+        document.getElementById('connectionStatus').style.color = "green";
     };
 
     WSS.onmessage = (event) => {
@@ -28,6 +30,14 @@ const main = async () => {
 
     WSS.onclose = () => {
         console.log("Disconnected from server");
+        document.getElementById('connectionStatus').innerText = "Disconnected";
+        document.getElementById('connectionStatus').style.color = "red";
+    };
+
+    WSS.onerror = () => {
+        console.log("Error with WebSocket connection");
+        document.getElementById('connectionStatus').innerText = "Error";
+        document.getElementById('connectionStatus').style.color = "orange";
     };
 
     document.getElementById('sendButton').addEventListener('click', () => {
@@ -38,6 +48,7 @@ const main = async () => {
     });
 
     document.getElementById('createRoomButton').addEventListener('click', () => {
+        console.log("Creating room...");
         sendMessage("createRoom", { name: 'test' });
     });
 
@@ -54,10 +65,13 @@ const main = async () => {
             sendMessage("leaveRoom", { room_id });
         }
     });
-    document.getElementById('messageAllButton').addEventListener('click', () => {
-        sendMessage("messageAll", { text: 'test' });
-        
-    });
+
+    const readyRoomButton = document.getElementById('readyRoom');
+    if (readyRoomButton) {
+        readyRoomButton.addEventListener('click', () => {
+            sendMessage("roomReady", { ready: true });
+        });
+    }
 }
 
 main();
