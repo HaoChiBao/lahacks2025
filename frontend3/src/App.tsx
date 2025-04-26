@@ -6,6 +6,8 @@ import LeaderboardPage from "./pages/Leaderboard.jsx";
 import HowToPlayPage from "./pages/HowToPlay.jsx";
 import GameOverPage from "./pages/GameOver.jsx";
 import WaitingRoomPage from "./pages/Multiplayer/WaitingRoom.jsx"
+import RoomSpotDifference from "./pages/Multiplayer/RoomSpotDifference.jsx"; // ⭐ added Room game page separately
+
 
 function App() {
   return (
@@ -17,7 +19,8 @@ function App() {
         <Route path="/multiplayer" element={<MultiplayerPage />} />
         <Route path="/gameover" element={<GameOverPage />} /> {/* ⭐ Added this */}
         <Route path="/multiplayer/room/:code" element={<WaitingRoomPage />} /> {/* ✅ this line */}
-        
+        <Route path="/multiplayer/room/:code/spot" element={<RoomSpotDifference />} /> {/* 🔥 separate in-room game */}
+
       </Routes>
     </Router>
   );
