@@ -1,22 +1,142 @@
-const wss = new (require('ws').Server)({ port: 8080 });
+import { WebSocketServer } from "ws";
 
-wss.on('connection', (ws) => {
-    console.log('Client connected');
+import SocketRooms from "./websocketRooms";
+import { WebSocketMessage } from "../types/socket";
 
-    ws.on('message', (message) => {
-        console.log('Received:', message);
+class Custom_WSS {
+    private wss: WebSocketServer | null = null;
+    private rooms: SocketRooms = new SocketRooms();
+    private clients = {};
 
-        // Example response
-        ws.send(JSON.stringify({ status: 'cool beans', received: message }));
-    });
+    init(server:any){
+        this.wss = new WebSocketServer({ server });
+        this.wss.on("connection", (ws: any) => {
+            const id = Math.random().toString(36).substring(2, 15);
 
-    ws.on('close', () => {
-        console.log('Client disconnected');
-    });
+            ws.id = id;
+            ws.room_id = null;
 
-    ws.on('error', (error) => {
-        console.warn('WebSocket error:', error);
-    });
-});
+            this.clients[id] = ws;
 
-console.log('WebSocket server is running on ws://localhost:8080');
+            console.log("Client connected", id);
+            this.sendMessage({
+                type: "connected",
+                payload: { id },
+            }, ws);
+
+            ws.on("message", (message: WebSocketMessage) => {
+                const parsedMessage = JSON.parse(message.toString()) as WebSocketMessage;
+                this.messageHandler(parsedMessage, ws);
+            });
+
+            ws.on("close", () => {
+                console.log("Client disconnected");
+                delete this.clients[id];
+            });
+        
+        });
+    }
+
+    sendMessage(message: WebSocketMessage, ws: any) {
+        if (ws.readyState === ws.OPEN) {
+            ws.send(JSON.stringify(message));
+        } else {
+            console.error("WebSocket is not open. Unable to send message.");
+        }
+    }
+
+    messageHandler(message: WebSocketMessage, ws: any) {
+        const { type, payload } = message;
+        if (!type || !payload) {
+            this.sendMessage({
+                type: "error",
+                payload: { message: "Invalid message format" },
+            }, ws);
+            return;
+        }
+
+        console.log("Received message:", type, payload);
+
+        switch (type) {
+            case "message":
+                console.log(`Message received: ${payload.text}`);
+                break;
+            case "createRoom":
+                const room_id = this.rooms.createRoom();
+                const join = this.rooms.joinRoom(room_id, ws);
+                if (!join) {
+                    this.sendMessage({
+                        type: "error",
+                        payload: { message: "Failed to join room" },
+                    }, ws);
+                    return;
+                }
+                this.sendMessage({
+                    type: "roomCreated",
+                    payload: { room_id },
+                }, ws);
+                this.sendMessage({
+                    type: "roomJoined",
+                    payload: { room_id },
+                }, ws);
+                break;
+            case "joinRoom":
+                if (this.rooms.joinRoom(payload.room_id, ws)) {
+                    this.sendMessage({
+                        type: "roomJoined",
+                        payload: { room_id: payload.room_id },
+                    }, ws);
+                } else {
+                    this.sendMessage({
+                        type: "error",
+                        payload: { message: "Room does not exist" },
+                    }, ws);
+                }
+                break;
+            case "leaveRoom":
+                console.log(`Leaving room: ${payload.room_id}`);
+                if (this.rooms.leaveRoom(payload.room_id, ws)) {
+                    this.sendMessage({
+                        type: "roomLeft",
+                        payload: { room_id: payload.room_id },
+                    }, ws);
+                } else {
+                    this.sendMessage({
+                        type: "error",
+                        payload: { message: "Failed to leave room or room does not exist" },
+                    }, ws);
+                }
+                break;
+
+            // send message to all clients in the same room
+            case "messageAll":
+                const room = this.rooms.rooms[ws.room_id];
+                if (room) {
+                    Object.values(room).forEach((client: any) => {
+                        if (client.readyState === client.OPEN) {
+                            client.send(JSON.stringify({
+                                type: "message",
+                                payload: { text: `${payload.text} from ${ws.id}` },
+                            }));
+                        }
+                    });
+                } else {
+                    this.sendMessage({
+                        type: "error",
+                        payload: { message: "Room does not exist" },
+                    }, ws);
+                }
+                break;
+            default:
+                this.sendMessage({
+                    type: "error",
+                    payload: { message: "Unknown message type" },
+                }, ws);
+                return;
+        }
+    }
+
+}
+
+
+export const wss = new Custom_WSS();

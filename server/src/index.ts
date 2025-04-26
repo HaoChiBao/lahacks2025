@@ -1,10 +1,12 @@
 import dotenv from "dotenv";
 import express from "express";
 import cors from "cors";
-import { WebSocketServer } from "ws";
 
 // get routes
 import { example } from "./routers/route-example";
+
+// get services
+import { wss } from "./services/websocket";
 
 dotenv.config();
 
@@ -31,18 +33,4 @@ const server = app.listen(PORT, () => {
 });
 
 // WebSocket setup
-const wss = new WebSocketServer({ server });
-
-wss.on("connection", (ws) => {
-  console.log("New WebSocket connection");
-
-  ws.on("message", (message: any) => {
-    console.log(`Received: ${message}`);
-    ws.send(`Echo: ${message}`);
-  });
-
-  ws.on("close", () => {
-    console.log("WebSocket connection closed");
-  });
-  
-});
+wss.init(server)
