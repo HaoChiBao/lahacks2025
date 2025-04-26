@@ -1,12 +1,13 @@
-// components/SpotTheDifferenceGame.jsx
 import { useState, useEffect } from "react";
 import { CodeBlock } from "../components/ui/CodeBlock"; 
 import { Button } from "../components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "../components/ui/tabs";
 import { Progress } from "../components/ui/progress";
 import { Badge } from "../components/ui/badge";
-import { Card } from "../components/ui/card";
 import { codeSnippets } from "../lib/code-snippets";
+import AnimalFloat from "../components/HerringFloat"; // ✅ Your 3D Animal Component
+
+const animalModel = "/animals/Sparrow_LOD_All.glb"; // 💡 Use ONE model now
 
 export default function SpotTheDifferenceGame({ mode = "single", playerName = "Player", players = [], onGameEnd }) {
   const [currentLevel, setCurrentLevel] = useState("beginner");
@@ -133,25 +134,23 @@ export default function SpotTheDifferenceGame({ mode = "single", playerName = "P
       </div>
 
       {showExplanation && (
-        <div className="flex flex-col items-center rounded-2xl bg-white shadow-md p-8 space-y-6">
-          {/* Animal avatar & speech */}
-          <div className="relative">
-            <img
-              src="/animals/beaver.png"
-              alt="Animal"
-              className="w-32 h-32 rounded-full object-cover border-4 border-gray-200 shadow-lg"
-            />
-            <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-6 w-4 h-4 rotate-45 bg-white shadow-md"></div>
+        <div className="flex flex-col md:flex-row items-center justify-center gap-8 bg-white rounded-2xl shadow-md p-8">
+          {/* 3D Floating Animal */}
+          <div className="w-full md:w-1/3 flex justify-center">
+            <AnimalFloat model={animalModel} />
           </div>
 
-          <div className="bg-white rounded-2xl shadow-md p-6 max-w-xl text-center text-gray-700 relative">
-            <h3 className="text-2xl font-bold mb-4">🐾 Here's what you missed!</h3>
+          {/* Text bubble */}
+          <div className="w-full md:w-2/3 space-y-4 text-center md:text-left">
+            <h3 className="text-3xl font-bold text-gray-800">
+              🎉 Good Job!
+            </h3>
             <p className="text-gray-600">{currentPuzzle.explanation}</p>
-          </div>
 
-          <Button className="mt-4" onClick={handleNextPuzzle}>
-            Next Puzzle
-          </Button>
+            <Button className="mt-4 bg-blue-500 hover:bg-blue-600 text-white" onClick={handleNextPuzzle}>
+              Next Puzzle →
+            </Button>
+          </div>
         </div>
       )}
     </div>

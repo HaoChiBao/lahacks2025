@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../co
 import { Link } from "react-router-dom";
 import AnimalBounce from "../components/AnimalBounce";
 import { Test } from "./test";
+import HerringFloat from "../components/HerringFloat";
 
 
 export default function HomePage() {
@@ -20,11 +21,12 @@ export default function HomePage() {
         </div>
       </header>
 
-      {/* Main */}
       <main className="flex-1 relative overflow-hidden">
-  {/* Animals floating in the background */}
-  <AnimalBounce />
-
+  {/* Floating Herring */}
+  <div className="flex justify-center mt-12 mb-[-40px]">
+    <HerringFloat />
+  </div>
+  
   <section className="relative w-full py-12 md:py-24 lg:py-32">
     <div className="px-4 md:px-6">
       <div className="flex flex-col items-center justify-center space-y-8 text-center">
@@ -112,7 +114,7 @@ export default function HomePage() {
           </div>
         </section>
       </main>
-      <Test/>
+      <Test/> //calls animal here lol
 
       {/* Footer */}
       <footer className="border-t border-gray-200 py-6 md:py-0">
