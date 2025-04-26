@@ -60,7 +60,7 @@ if (user.isActive) {
     },
     {
       language: "python",
-      incorrectCode: `def greet(name):
+      incorrectCode: `def greet(alice):
     return "Hello, " + name + "!"
 
 message = greet("Alice")
@@ -70,7 +70,7 @@ print(message)`,
 
 message = greet("Alice")
 print(message)`,
-      differences: [],
+      differences: [1],
       explanation:
         "This is a trick question! Both code snippets are actually identical and correct. Sometimes code might look correct at first glance, and it's important to verify before making changes.",
     },

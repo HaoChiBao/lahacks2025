@@ -1,14 +1,15 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft, Clock, Code2, Heart } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 import { Button } from "../../components/ui/button";
 import { Card, CardContent } from "../../components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "../../components/ui/tabs";
 import { Badge } from "../../components/ui/badge";
 import { Progress } from "../../components/ui/progress";
-import { CodeBlock } from "../../components/CodeBlock";
-import { codeSnippets } from "../lib/code-snippets";
+import { CodeBlock } from "../../components/ui/CodeBlock";
+import { codeSnippets } from "../../lib/code-snippets";
 
 export default function SpotTheDifference() {
   const [currentLevel, setCurrentLevel] = useState("beginner");
@@ -22,6 +23,9 @@ export default function SpotTheDifference() {
 
   const currentPuzzle = codeSnippets[currentLevel][currentSnippet];
   const totalDifferences = currentPuzzle.differences.length;
+
+  const navigate = useNavigate();
+
 
   useEffect(() => {
     if (!gameActive) return;
@@ -72,12 +76,18 @@ export default function SpotTheDifference() {
   };
 
   const handleNextPuzzle = () => {
-    const nextSnippet = (currentSnippet + 1) % codeSnippets[currentLevel].length;
-    setCurrentSnippet(nextSnippet);
-    setFoundDifferences([]);
-    setShowExplanation(false);
-    setTimeLeft(60);
+    if (currentSnippet + 1 >= 3) {
+      // After answering 3 questions, go to Game Over page
+      navigate(`/gameover?score=${score}&correct=3&total=3&level=${currentLevel}&mode=single`);
+    } else {
+      const nextSnippet = (currentSnippet + 1) % codeSnippets[currentLevel].length;
+      setCurrentSnippet(nextSnippet);
+      setFoundDifferences([]);
+      setShowExplanation(false);
+      setTimeLeft(60);
+    }
   };
+  
 
   const handleLevelChange = (level) => {
     setCurrentLevel(level);
