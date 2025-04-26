@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "../../components/ui/button";
 import SpotTheDifferenceGame from "../../components/SpotTheDifferenceGame"; // ✅ REUSABLE
-//import FillTheBlanksGame from "../../components/FillTheBlanksGame";         // ✅ REUSABLE
+import FillTheBlankGame from "../../components/FillTheBlankGame";         // ✅ REUSABLE
 
 export default function Game() {
   const [gameMode, setGameMode] = useState(null);
@@ -36,7 +36,7 @@ export default function Game() {
   }
 
   if (gameMode === "fill") {
-    return <FillTheBlanksGame mode="single" />;
+    return <FillTheBlankGame mode="single" />;
   }
 
   return null;
