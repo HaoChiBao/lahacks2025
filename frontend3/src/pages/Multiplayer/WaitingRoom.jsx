@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/ca
 // Removed unused imports
 
 export default function WaitingRoom() {
-  const { code } = useParams(); // :code from /multiplayer/room/:code
+  const { code } = useParams();
   const [searchParams] = useSearchParams();
   const playerName = searchParams.get("name") || "Guest";
 
@@ -165,7 +165,7 @@ export default function WaitingRoom() {
         </div>
       </header>
 
-      {/* Main */}
+      {/* Main Content */}
       <main className="flex-1 container mx-auto p-6">
         {step === 1 && (
           <div className="max-w-2xl mx-auto">

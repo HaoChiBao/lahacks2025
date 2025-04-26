@@ -14,8 +14,8 @@ export default function MultiplayerPage() {
   const [roomCode, setRoomCode] = useState("");
   const [createdCode, setCreatedCode] = useState("");
   const [gameModeSelect, setGameModeSelect] = useState(false);
-  const [tempCode, setTempCode] = useState(""); // temporary code before we navigate
-  const [selectedMode, setSelectedMode] = useState(""); // store selected game mode
+  const [tempCode, setTempCode] = useState("");
+  const [selectedMode, setSelectedMode] = useState("");
 
   const navigate = useNavigate();
 
@@ -28,7 +28,7 @@ export default function MultiplayerPage() {
     if (!playerName) return;
     const code = generateRoomCode();
     setTempCode(code);
-    setGameModeSelect(true); // move to mode selection
+    setGameModeSelect(true);
   }
 
   function handleModeSelect() {
@@ -43,12 +43,13 @@ export default function MultiplayerPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-black text-white">
-      <header className="bg-background border-b border-gray-800">
+    <div className="flex min-h-screen flex-col bg-[#f9fafb] text-gray-800">
+      {/* Header */}
+      <header className="bg-[#f9fafb]">
         <div className="flex h-16 items-center px-4 sm:px-6 lg:px-8">
           <Link to="/" className="mr-4">
-            <Button variant="ghost" size="icon">
-              <ArrowLeft className="h-4 w-4" />
+            <Button variant="ghost" size="icon" className="hover:bg-blue-100">
+              <ArrowLeft className="h-5 w-5" />
               <span className="sr-only">Back</span>
             </Button>
           </Link>
@@ -56,43 +57,50 @@ export default function MultiplayerPage() {
         </div>
       </header>
 
+      {/* Main */}
       <main className="flex-1 container py-12">
         <div className="max-w-md mx-auto">
           {!gameModeSelect ? (
             <Tabs defaultValue="join" value={tab} onValueChange={setTab}>
-              <TabsList className="grid w-full grid-cols-2 mb-6">
-                <TabsTrigger value="join">Join a Game</TabsTrigger>
-                <TabsTrigger value="create">Create a Game</TabsTrigger>
+              <TabsList className="grid w-full grid-cols-2 mb-6 bg-[#f1f5f9] rounded-xl p-1 shadow-inner">
+                <TabsTrigger value="join" className="rounded-xl data-[state=active]:bg-white data-[state=active]:text-black transition-all">
+                  Join
+                </TabsTrigger>
+                <TabsTrigger value="create" className="rounded-xl data-[state=active]:bg-white data-[state=active]:text-black transition-all">
+                  Create
+                </TabsTrigger>
               </TabsList>
 
               <TabsContent value="join">
-                <Card>
+              <Card className="bg-white shadow-md rounded-2xl p-6 border-0">
                   <CardHeader>
                     <CardTitle>Join a Game</CardTitle>
-                    <CardDescription>Enter a room code to join an existing game</CardDescription>
+                    <CardDescription className="text-gray-500">Enter a room code to join</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <div className="space-y-2">
+                    <div className="space-y-1">
                       <label htmlFor="name" className="text-sm font-medium">Your Name</label>
                       <Input
                         id="name"
                         placeholder="Enter your name"
                         value={playerName}
                         onChange={(e) => setPlayerName(e.target.value)}
+                        className="rounded-xl bg-gray-100 border-0 focus:ring-2 focus:ring-blue-400"
                       />
                     </div>
-                    <div className="space-y-2">
+                    <div className="space-y-1">
                       <label htmlFor="room" className="text-sm font-medium">Room Code</label>
                       <Input
                         id="room"
                         placeholder="Enter room code"
                         value={roomCode}
                         onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
+                        className="rounded-xl bg-gray-100 border-0 focus:ring-2 focus:ring-blue-400"
                       />
                     </div>
                   </CardContent>
                   <CardFooter>
-                    <Button className="w-full" onClick={handleJoin}>
+                    <Button className="w-full bg-gray-100 text-gray-800 hover:bg-blue-500 hover:text-white rounded-xl">
                       Join Game
                     </Button>
                   </CardFooter>
@@ -100,19 +108,20 @@ export default function MultiplayerPage() {
               </TabsContent>
 
               <TabsContent value="create">
-                <Card>
+              <Card className="bg-white shadow-md rounded-2xl p-6 border-0">
                   <CardHeader>
                     <CardTitle>Create a Game</CardTitle>
-                    <CardDescription>Create a new room and share the code</CardDescription>
+                    <CardDescription className="text-gray-500">Generate a new room code</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <div className="space-y-2">
+                    <div className="space-y-1">
                       <label htmlFor="name-create" className="text-sm font-medium">Your Name</label>
                       <Input
                         id="name-create"
                         placeholder="Enter your name"
                         value={playerName}
                         onChange={(e) => setPlayerName(e.target.value)}
+                        className="rounded-xl bg-gray-100 border-0 focus:ring-2 focus:ring-blue-400"
                       />
                     </div>
 
@@ -120,26 +129,28 @@ export default function MultiplayerPage() {
                       <div className="space-y-2">
                         <label className="text-sm font-medium">Room Code</label>
                         <div className="flex items-center gap-2">
-                          <div className="bg-muted p-2 rounded-md font-mono text-center flex-1">
+                          <div className="bg-gray-100 p-2 rounded-xl font-mono text-center flex-1 text-lg">
                             {createdCode}
                           </div>
-                          <Button variant="outline" size="icon" onClick={copyCode}>
-                            <Copy className="h-4 w-4" />
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="hover:bg-blue-100"
+                            onClick={copyCode}
+                          >
+                            <Copy className="h-5 w-5" />
                           </Button>
                         </div>
-                        <p className="text-xs text-muted-foreground">
-                          Share this code with friends
-                        </p>
                       </div>
                     )}
                   </CardContent>
                   <CardFooter className="flex flex-col gap-4">
                     {!createdCode ? (
-                      <Button onClick={handleCreate} className="w-full">
+                      <Button className="w-full bg-gray-100 text-gray-800 hover:bg-blue-500 hover:text-white rounded-xl" onClick={handleCreate}>
                         Create Game
                       </Button>
                     ) : (
-                      <Button variant="outline" onClick={() => {
+                      <Button variant="ghost" className="w-full hover:bg-blue-100 rounded-xl" onClick={() => {
                         setCreatedCode("");
                         setTempCode("");
                         setGameModeSelect(false);
