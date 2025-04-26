@@ -61,6 +61,8 @@ class SocketRooms {
             ready: 0,
             total: 0,
             difficulty: 0,
+            language: 0,
+            gameMode: 0,
         }
         if (this.rooms[room_id]) {
             const clients = this.rooms[room_id].clients
@@ -71,6 +73,12 @@ class SocketRooms {
                 }
                 if (this.rooms[room_id].state.client_state[ws].choices.difficulty !== 'default') {
                     clientResponses.difficulty++
+                }
+                if (this.rooms[room_id].state.client_state[ws].choices.language !== 'default') {
+                    clientResponses.language++
+                }
+                if (this.rooms[room_id].state.client_state[ws].choices.gameMode !== 'default') {
+                    clientResponses.gameMode++
                 }
             }
         }

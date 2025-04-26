@@ -3,7 +3,7 @@ import express from 'express'
 
 import { wss } from '../services/websocket'
 
-const router = express.Router()
+const router = express.Router() 
 
 // random post request
 // router.post('/startGame', async (req, res) => {
