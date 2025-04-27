@@ -109,13 +109,14 @@ export default function FillTheBlankGame({
     const availablePlaceholders = currentQuestion.code.match(/<option: \d+>/g) || [];
     const placeholderCount = availablePlaceholders.length;
   
-    // 💥 Prune extra answers that don't have a placeholder
+    // Prune extra answers
     setSelectedAnswers((prev) => pruneExtraAnswers(prev, placeholderCount));
   
     const correct = Object.keys(selectedAnswers).filter(
       (key) => selectedAnswers[key].option === currentQuestion.options[Number(key) - 1]
-
     ).length;
+  
+    // const total = placeholderCount; // <-- score is based on number of placeholders!
   
     setScore((prevScore) => prevScore + correct * 10);
     setQuestionsAnswered((prev) => prev + 1);
@@ -124,6 +125,7 @@ export default function FillTheBlankGame({
       nextQuestionRef.current?.scrollIntoView({ behavior: "smooth" });
     }, 300);
   };
+  
   
   const handleNextQuestion = () => {
     if (currentQuestionIndex < questions.length - 1) {
