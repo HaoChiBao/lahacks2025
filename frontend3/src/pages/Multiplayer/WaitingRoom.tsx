@@ -82,6 +82,7 @@ export default function WaitingRoom() {
 
   useEffect(() => {
     const socket = new WebSocket(`ws:${import.meta.env.VITE_API_URL}`);
+    // const socket = new WebSocket(`wss:${import.meta.env.VITE_API_URL}`);
     const room_id = code;
 
     socket.onopen = () => {
