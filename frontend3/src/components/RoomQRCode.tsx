@@ -5,7 +5,7 @@ import { Button } from "./ui/button";
 export function RoomQRCode({ code }: { code: string }) {
   const [showQR, setShowQR] = useState(false);
 
-  const roomUrl = `${window.location.origin}/multiplayer/${code}`;
+  const roomUrl = `${window.location.origin}/multiplayer/room/${code}`;
 
   return (
     <div className="flex flex-col items-center space-y-2">
