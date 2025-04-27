@@ -17,6 +17,7 @@ interface finalGameSelection {
 }
 
 export default function WaitingRoom() {
+  // get code query param
   const { code } = useParams();
   const [searchParams] = useSearchParams();
   const playerName = searchParams.get("name") || "Guest";
