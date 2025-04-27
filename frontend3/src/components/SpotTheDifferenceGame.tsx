@@ -46,6 +46,9 @@ export default function SpotTheDifferenceGame({
   const totalQuestions = matchingSnippets.length;
   const totalDifferences = currentPuzzle?.differences.length || 0;
 
+  const [correctQuestions, setCorrectQuestions] = useState(0);
+
+
   useEffect(() => {
     if (!gameActive) return;
     const timer = setInterval(() => {
@@ -74,21 +77,25 @@ export default function SpotTheDifferenceGame({
 
   const handleLineClick = (lineNumber: number) => {
     if (!gameActive || showExplanation) return;
+  
     if (currentPuzzle?.differences.includes(lineNumber)) {
       if (!foundDifferences.includes(lineNumber)) {
         setFoundDifferences(prev => [...prev, lineNumber]);
         const points = Math.round(10 * (timeLeft / 60));
         setScore(prev => prev + points);
-
+  
         if (foundDifferences.length + 1 === totalDifferences) {
+          // 🎯 Player correctly found all differences without wrong click!
+          setCorrectQuestions(prev => prev + 1);
           setShowExplanation(true);
         }
       }
     } else {
-      // Wrong choice: immediately move to explanation
+      // ❌ Wrong choice → move to explanation
       setShowExplanation(true);
     }
   };
+  
 
   const handleNextPuzzle = () => {
     if (currentSnippet + 1 >= totalQuestions) {
@@ -103,17 +110,20 @@ export default function SpotTheDifferenceGame({
   
 
   const navigateToGameOver = () => {
-    const correctAnswers = currentSnippet + (showExplanation ? 1 : 0);  // Fix: count if currently in explanation stage
-    navigate(`/gameover`, {
+    const accuracy = totalQuestions > 0 ? Math.round((correctQuestions / totalQuestions) * 100) : 0;
+  
+    navigate("/gameover", {
       state: {
         score,
         level: selectedDifficulty,
         mode,
-        correct: correctAnswers,
+        correct: correctQuestions,
         total: totalQuestions,
+        accuracy,  // 🎯 Add accuracy!
       },
     });
   };
+  
 
   if (!currentPuzzle) {
     return (

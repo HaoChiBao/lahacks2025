@@ -11,15 +11,8 @@ export default function GameOverPage() {
   const location = useLocation();
   const [showConfetti, setShowConfetti] = useState(true);
 
-  // 🛠 Correct: Parse from query string (NOT state!)
-  const searchParams = new URLSearchParams(location.search);
-  const score = parseInt(searchParams.get("score") || "0", 10);
-  const level = searchParams.get("level") || "beginner";
-  const mode = searchParams.get("mode") || "single";
-  const correctAnswers = parseInt(searchParams.get("correct") || "0", 10);
-  const totalQuestions = parseInt(searchParams.get("total") || "0", 10);
-
-  const accuracy = totalQuestions > 0 ? Math.round((correctAnswers / totalQuestions) * 100) : 0;
+  // ✅ Only reading from location.state now
+  const { score = 0, level = "beginner", mode = "single", correct = 0, total = 0, accuracy = 0 } = location.state || {};
 
   useEffect(() => {
     if (score > 0) {
@@ -109,7 +102,7 @@ export default function GameOverPage() {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col items-center rounded-lg bg-gray-100 p-4">
-                <div className="text-xl font-semibold text-gray-700">{correctAnswers}</div>
+                <div className="text-xl font-semibold text-gray-700">{correct}</div>
                 <p className="text-xs text-gray-500">Questions Correct</p>
               </div>
               <div className="flex flex-col items-center rounded-lg bg-gray-100 p-4">
