@@ -1,8 +1,12 @@
+import dotenv from "dotenv"
+
 import { SocketRoom } from "../types/socket"
 
 import { Difficulty, Language, GameModes } from "../types/socket"
 
 import { generateFillInTheBlank } from "./generateQuestions"
+
+dotenv.config()
 
 class SocketRooms {
     rooms: SocketRoom
@@ -77,7 +81,6 @@ class SocketRooms {
                     options.gameMode[choices.gameMode] = (options.gameMode[choices.gameMode] || 0) + 1;
                 }
 
-                console.log(clientInfo)
                 if (clientInfo.difficulty === clientInfo.total && clientInfo.language === clientInfo.total && clientInfo.gameMode === clientInfo.total && this.rooms[room_id].mode === 'default') {
 
                     
@@ -111,6 +114,7 @@ class SocketRooms {
                         }
                     }
 
+                    console.log("Generating Questions:", process.env.GEMINI_API_KEY)
                     generateFillInTheBlank(finalState.language, finalState.difficulty, 5)
                     .then((questions) => {
                         this.rooms[room_id].state.questions = questions
