@@ -27,7 +27,7 @@ export default function HomePage() {
     <AnimalBounce />
   </div>
 
-  <section className="relative w-full py-12 md:py-24 lg:py-32">
+  <section className="relative w-full py-12 md:py-24 lg:py-32" style={{zIndex: 10000}}>
     <div className="px-4 md:px-6">
       <div className="flex flex-col items-center justify-center space-y-8 text-center">
         {/* Title */}
@@ -36,7 +36,7 @@ export default function HomePage() {
             BrainBug
           </h2>
           <p className="max-w-[700px] text-gray-500 md:text-xl">
-            Train your debugging skills by spotting differences between incorrect and correct code snippets.
+            Train your debugging and coding skills with our games.
           </p>
         </div>
 
@@ -57,7 +57,7 @@ export default function HomePage() {
         </div>
 
         {/* How to Play */}
-        <div className="w-full max-w-xs">
+        <div className="w-full max-w-xs" >
           <Link to="/how-to-play">
             <Button
               variant="outline"
@@ -74,36 +74,36 @@ export default function HomePage() {
 
 
         {/* Features Section (fixed to match theme) */}
-        <section className="w-full py-12 md:py-24 lg:py-32 bg-[#f9fafb]">
+        <section className="w-full py-12 md:py-24 lg:py-32 bg-[#f9fafb]"style={{zIndex: 10000}}>
           <div className="px-4 md:px-6">
             <div className="mx-auto grid max-w-5xl items-center gap-6 lg:grid-cols-2 lg:gap-12">
               <div className="space-y-4 text-center lg:text-left">
-                <div className="inline-block rounded-lg bg-gray-200 px-3 py-1 text-sm text-gray-700">
+                <div className="inline-block rounded-lg bg-gray-200 px-3 py-1 text-sm text-gray-700" style={{zIndex: 10000}}>
                   Features
                 </div>
-                <h2 className="text-3xl font-bold tracking-tight sm:text-4xl text-gray-800">
+                <h2 className="text-3xl font-bold tracking-tight sm:text-4xl text-gray-800" style={{zIndex: 10000}}>
                   Improve Your Coding Skills
                 </h2>
-                <p className="max-w-[600px] text-gray-500 md:text-xl">
+                <p className="max-w-[600px] text-gray-500 md:text-xl" style={{zIndex: 10000}}>
                   Our games help you spot bugs faster, strengthen your eye for details, and become a better coder.
                 </p>
               </div>
 
               {/* Feature cards */}
-              <div className="grid gap-6">
-                <Card className="bg-white shadow-sm">
+              <div className="grid gap-6" style={{zIndex: 10000}}>
+                <Card className="bg-white shadow-sm" style={{zIndex: 10000}}>
                   <CardHeader>
                     <CardTitle>Multiple Languages</CardTitle>
                     <CardDescription>Practice spotting bugs in JavaScript, Python, and more.</CardDescription>
                   </CardHeader>
                 </Card>
-                <Card className="bg-white shadow-sm">
+                <Card className="bg-white shadow-sm" style={{zIndex: 10000}}>
                   <CardHeader>
                     <CardTitle>Multiplayer Mode</CardTitle>
                     <CardDescription>Challenge friends and race to spot differences!</CardDescription>
                   </CardHeader>
                 </Card>
-                <Card className="bg-white shadow-sm">
+                <Card className="bg-white shadow-sm" style={{zIndex: 10000}}>
                   <CardHeader>
                     <CardTitle>Leaderboards</CardTitle>
                     <CardDescription>Track your rank and climb to the top globally.</CardDescription>
