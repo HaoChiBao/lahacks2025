@@ -25,7 +25,11 @@ const MultiplayerGameOver: React.FC = () => {
     };
 
     return (
-        <div className="space-y-8 p-6 md:p-12 bg-gray-100 min-h-screen">
+        <div
+            className={`min-h-screen min-w-full flex flex-col items-center justify-center ${
+                isCurrentUserWinner ? 'bg-green-500' : 'bg-red-500'
+            }`}
+        >
             <Card className="p-8 space-y-6 text-center shadow-md rounded-2xl bg-white">
                 <h1 className="text-2xl font-semibold text-gray-900">
                     Game Over
