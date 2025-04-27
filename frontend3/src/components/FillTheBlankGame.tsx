@@ -33,6 +33,7 @@ export default function FillTheBlankGame({
   const [selectedAnswers, setSelectedAnswers] = useState<Record<string, string>>({});
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [shuffledOptions, setShuffledOptions] = useState<string[]>([]);
+  const [usedOptionIndexes, setUsedOptionIndexes] = useState<number[]>([]);
   const nextQuestionRef = useRef<HTMLButtonElement>(null);
 
   const currentQuestion = questions[currentQuestionIndex];
@@ -43,10 +44,12 @@ export default function FillTheBlankGame({
       setShuffledOptions(shuffled);
       setSelectedAnswers({});
       setIsSubmitted(false);
+      setUsedOptionIndexes([]);
     }
   }, [currentQuestionIndex]);
+  
 
-  const handleOptionSelect = (option: string) => {
+  const handleOptionSelect = (option: string, optionIndex: number) => {
     if (isSubmitted) return;
   
     const availablePlaceholders = currentQuestion.code.match(/<option: \d+>/g) || [];
@@ -57,19 +60,16 @@ export default function FillTheBlankGame({
   
     if (!nextPlaceholder) return;
   
-    setSelectedAnswers((prev) => {
-      const existingPlaceholder = Object.keys(prev).find((key) => prev[key] === option);
+    if (usedOptionIndexes.includes(optionIndex)) return; // Already used this specific button
   
-      if (existingPlaceholder) {
-        // If this option was already selected somewhere, unselect it
-        const { [existingPlaceholder]: _, ...rest } = prev;
-        return rest;
-      } else {
-        // Otherwise, add it to the next available placeholder
-        return { ...prev, [nextPlaceholder]: option };
-      }
-    });
+    setSelectedAnswers((prev) => ({
+      ...prev,
+      [nextPlaceholder]: option,
+    }));
+  
+    setUsedOptionIndexes((prev) => [...prev, optionIndex]);
   };
+  
   
 
   const handleSubmit = () => {
@@ -217,25 +217,21 @@ export default function FillTheBlankGame({
       <Card className="p-6 space-y-4">
         <h3 className="text-gray-700 font-semibold text-lg">Options</h3>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-          {shuffledOptions.map((option, index) => (
+        {shuffledOptions.map((option, index) => (
             <Button
-              key={index}
-              className={`${
-                Object.values(selectedAnswers).includes(option)
-                  ? "bg-blue-500 text-white"
-                  : "bg-gray-100 text-gray-700"
-              }`}
-              onClick={() =>
-                handleOptionSelect(
-                //   String(Object.keys(selectedAnswers).length + 1),
-                  option
-                )
-              }
-              disabled={isSubmitted}
+                key={index}
+                className={`${
+                usedOptionIndexes.includes(index)
+                    ? "bg-blue-500 text-white"
+                    : "bg-gray-100 text-gray-700"
+                }`}
+                onClick={() => handleOptionSelect(option, index)}
+                disabled={isSubmitted}
             >
-              {option}
+                {option}
             </Button>
-          ))}
+            ))}
+
         </div>
       </Card>
 
