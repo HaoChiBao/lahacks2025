@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from "react";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { Card } from "./ui/card";
+import AnimalFloat from "./HerringFloat";
+const animalModel = "/animals/Sparrow_LOD_All.glb";
 
 const sampleQuestions = [
     {
@@ -73,6 +75,8 @@ export default function FillTheBlankGame() {
     }, [currentQuestionIndex]);
 
     const handleOptionSelect = (placeholder, option) => {
+        if (isSubmitted) return; // Prevent changes after submission
+
         setSelectedAnswers((prev) => {
             const existingPlaceholder = Object.keys(prev).find(
                 (key) => prev[key] === option
@@ -145,30 +149,28 @@ export default function FillTheBlankGame() {
         ).length;
         const incorrect = total - correct;
         const percentage = (correct / total) * 100;
-        let resultColor = "text-gray-800"; // Default color
-        if (percentage === 100) {
-            resultColor = "text-green-800";
-        } else if (percentage >= 50) {
-            resultColor = "text-yellow-800";
-        } else {
-            resultColor = "text-red-800";
-        }
 
         return (
-            <Card className="p-6 space-y-4">
-            <h3 className={`font-semibold text-2xl ${resultColor}`}>Results</h3>
-            <div className="space-y-4">
-                <p className={`text-lg ${resultColor}`}>
+            <div className="flex flex-col md:flex-row items-center justify-center gap-4 bg-white rounded-xl shadow-md p-4">
+            <div className="w-full md:w-1/3 flex justify-center">
+                <AnimalFloat model={animalModel} />
+            </div>
+
+            <div className="w-full md:w-2/3 space-y-2 text-center md:text-left">
+                <h3 className={`text-2xl font-bold ${percentage === 100 ? "text-green-800" : percentage >= 50 ? "text-yellow-800" : "text-red-800"}`}>
+                🎉 Results
+                </h3>
+                <p className={`text-lg ${percentage === 100 ? "text-green-800" : percentage >= 50 ? "text-yellow-800" : "text-red-800"}`}>
                 <span className="font-bold">Correct:</span> {correct} / {total} ({percentage.toFixed(1)}%)
                 </p>
-                <p className={`text-lg ${resultColor}`}>
+                <p className={`text-lg ${percentage === 100 ? "text-green-800" : percentage >= 50 ? "text-yellow-800" : "text-red-800"}`}>
                 <span className="font-bold">Incorrect:</span> {incorrect}
                 </p>
+                
+                <h4 className="text-lg font-semibold text-gray-700">Description of what the code does:</h4>
+                <p className="text-gray-600">{currentQuestion.description}</p>
             </div>
-            <p className="text-gray-600 text-base bg-gray-100 p-4 rounded-lg">
-                {currentQuestion.description}
-            </p>
-            </Card>
+            </div>
         );
     };
 
@@ -203,6 +205,7 @@ export default function FillTheBlankGame() {
                                     option
                                 )
                             }
+                            disabled={isSubmitted} // Disable buttons after submission
                         >
                             {option}
                         </Button>

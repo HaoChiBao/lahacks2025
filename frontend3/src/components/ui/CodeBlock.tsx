@@ -22,7 +22,7 @@ export function CodeBlock({ code, language, highlightLines = [], onLineClick }: 
   }
 
   return (
-    <pre className="relative overflow-x-auto rounded-md bg-gray-900 p-4 font-mono text-sm text-gray-100 shadow-inner">
+    <pre className="relative overflow-x-auto rounded-md bg-gray-100 p-4 font-mono text-sm text-gray-900 shadow-inner">
       <code>
         {lines.map((line, index) => {
           const lineNumber = index + 1
@@ -33,14 +33,19 @@ export function CodeBlock({ code, language, highlightLines = [], onLineClick }: 
               key={index}
               className={cn(
                 "flex px-2 py-1 rounded-md cursor-pointer transition-colors",
-                isHighlighted && "bg-green-700/30",
-                hoveredLine === lineNumber && "bg-gray-700/50",
+                isHighlighted && "bg-yellow-200",
+                hoveredLine === lineNumber && "bg-gray-300",
               )}
               onClick={() => handleLineClick(lineNumber)}
               onMouseEnter={() => setHoveredLine(lineNumber)}
               onMouseLeave={() => setHoveredLine(null)}
             >
-              <span className="select-none w-8 text-gray-500 text-right mr-4">{lineNumber}</span>
+              <span
+                className="select-none text-gray-500 text-right mr-4"
+                style={{ width: "2rem" }} // Fixed width for alignment
+              >
+                {lineNumber}
+              </span>
               <span className="flex-1 whitespace-pre">{line || " "}</span>
             </div>
           )

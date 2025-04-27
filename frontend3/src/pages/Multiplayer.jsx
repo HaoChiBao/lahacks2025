@@ -8,6 +8,7 @@ import { Input } from "../components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
 import { generateRoomCode } from "../lib/utils";
 
+
 export default function MultiplayerPage() {
   const [tab, setTab] = useState("join");
   const [playerName, setPlayerName] = useState("");
