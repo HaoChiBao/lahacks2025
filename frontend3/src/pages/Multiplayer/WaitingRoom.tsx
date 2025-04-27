@@ -4,6 +4,7 @@ import { ArrowLeft, Users, Copy } from "lucide-react";
 
 import { Button } from "../../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
+import ClientProgressMeter from "@/components/ClientProgressMeter";
 
 import FillTheBlankGame from "../../components/FillTheBlankGame";
 
@@ -81,7 +82,12 @@ export default function WaitingRoom() {
 
   const [gameQuestions, setGameQuestions] = useState([]);
 
-  // const [gameScore, setGameScore] = useState(0);
+  const [timerActive, setTimerActive] = useState(false);
+
+  const [gameScore, setGameScore] = useState(0);
+
+  const [completed, setCompleted] = useState(false); // State to track if the game is completed
+
 
   useEffect(() => {
     const socket = new WebSocket(`ws:${import.meta.env.VITE_API_URL}`);
@@ -113,22 +119,26 @@ export default function WaitingRoom() {
           if ((message.payload.gameState.questions).length > 0) {
             setGameQuestions(message.payload.gameState.questions);
 
-            setTimeout(() => {
-              setGameStartCountdown(3);
-      
-              const loop = setInterval(() => {
-                setGameStartCountdown((prev) => {
-                  if (prev <= 0) {
-                    clearInterval(loop);
-                    setStep(6);
-                    return 0;
-                  }
-                  return prev - 1;
-                });
-              }, 1000);
-            }, 500);
+            if(!timerActive) {
+              setTimerActive(true);
+              setTimeout(() => {
+                setGameStartCountdown(3);
+        
+                const loop = setInterval(() => {
+                  setGameStartCountdown((prev) => {
+                    if (prev <= 0) {
+                      clearInterval(loop);
+                      setStep(6);
+                      setTimerActive(false);
+                      return 0;
+                    }
+                    return prev - 1;
+                  });
+                }, 1000);
+              }, 500);
+            }
           }
-          
+
           break;
         case "connected":
           setCurrentUserId(message.payload.id);
@@ -153,16 +163,17 @@ export default function WaitingRoom() {
     };
   }, [code, playerName]);
 
-  // useEffect(() => {
-  //   if (step === 5) {
-  //     const gameMode = finalGameSelection?.gameMode || currentUserState.choices.gameMode;
-  //     const language = finalGameSelection?.language || currentUserState.choices.language;
-  //     const difficulty = finalGameSelection?.difficulty || currentUserState.choices.difficulty;
-
-  //     console.log("Final Game Selection", gameMode, language, difficulty);
-
-  //   }
-  // }, [step])
+  useEffect(() => {
+    // update the game score to the server ws
+    if (wss && ws_connected) {
+      wss.send(
+        JSON.stringify({
+          type: "updateGameScore",
+          payload: { score: gameScore },
+        })
+      );
+    }
+  }, [gameScore])
 
   useEffect(() => {
     const counts = clientInfo;
@@ -471,10 +482,25 @@ export default function WaitingRoom() {
         )}
 
         {step === 6 && (
-          <div className="max-w-2xl mx-auto">
-            {/* <FillTheBlankGame setGameScore={setGameScore} /> */}
-            <FillTheBlankGame questions = {gameQuestions} />
-          </div>
+          <>
+            <div className="max-w-2xl mx-auto">
+              {/* <FillTheBlankGame setGameScore={setGameScore} /> */}
+              <FillTheBlankGame score = {gameScore} setScore={setGameScore} setCompleted = {setCompleted} questions = {gameQuestions} />
+            </div>
+              {/* Player Progress Meters (right side) */}
+            <div className="w-full lg:w-1/3 space-y-6">
+            <h2 className="text-2xl font-bold text-gray-700 text-center">Players Progress</h2>
+              <ClientProgressMeter
+                clients={Object.fromEntries(
+                  Object.entries(gameState.client_state).map(([clientId]) => [
+                    clientId,
+                    { score: 0 }, // Default score or replace with actual score logic
+                  ])
+                )}
+                totalQuestions={gameQuestions.length}
+              />
+            </div>
+          </>
         )}
 
       </main>

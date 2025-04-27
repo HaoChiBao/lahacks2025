@@ -14,9 +14,13 @@ interface Question {
 
 interface FillTheBlankGameProps {
     questions: Question[];
+    // setScore is a useState setter function to update the score in the parent component
+    score: number;
+    setCompleted: React.Dispatch<React.SetStateAction<boolean>>;
+    setScore: React.Dispatch<React.SetStateAction<number>>;
 }
 
-export default function FillTheBlankGame({ questions }: FillTheBlankGameProps) {
+export default function FillTheBlankGame({ questions, score, setScore, setCompleted }: FillTheBlankGameProps) {
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [selectedAnswers, setSelectedAnswers] = useState<Record<string, string>>({});
     const [isSubmitted, setIsSubmitted] = useState(false);
@@ -33,7 +37,7 @@ export default function FillTheBlankGame({ questions }: FillTheBlankGameProps) {
     }, [currentQuestionIndex]);
 
     const handleOptionSelect = (placeholder: string, option: string) => {
-        if (isSubmitted) return; // Prevent changes after submission
+        if (isSubmitted) return;
 
         setSelectedAnswers((prev: Record<string, string>) => {
             const existingPlaceholder = Object.keys(prev).find(
@@ -51,6 +55,21 @@ export default function FillTheBlankGame({ questions }: FillTheBlankGameProps) {
 
     const handleSubmit = () => {
         setIsSubmitted(true);
+
+        const correct = Object.keys(selectedAnswers).filter(
+            (key) => selectedAnswers[key] === currentQuestion.options[Number(key) - 1]
+        ).length;
+
+        setScore((prevScore) => prevScore + correct * 10);
+
+        // if (currentQuestionIndex === questions.length - 1) {
+        //     setCompleted(true);
+        // } else {
+        //     setTimeout(() => {
+        //         nextQuestionRef.current?.scrollIntoView({ behavior: "smooth" });
+        //     }, 300);
+        // }
+
         setTimeout(() => {
             nextQuestionRef.current?.scrollIntoView({ behavior: "smooth" });
         }, 300);
@@ -163,12 +182,28 @@ export default function FillTheBlankGame({ questions }: FillTheBlankGameProps) {
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <h1 className="text-xl font-bold text-gray-700">Fill in the Blank Game</h1>
                 <Badge className="bg-gray-200 text-gray-700">Programming</Badge>
+                
+            </div>
+
+            <div className="flex justify-center items-center my-4">
+                <Badge className="bg-green-100 text-green-800 text-lg">
+                    Score: {score}
+                </Badge>
             </div>
 
             <Card className="p-6 space-y-4">
                 <h3 className="text-gray-700 font-semibold text-lg">Code Snippet</h3>
+                
                 <div className="rounded-xl bg-gray-100 p-4 text-gray-800 overflow-auto">
                     {renderCodeWithBlanks()}
+                </div>
+
+
+                {/* New Question Progress Indicator */}
+                <div className="flex justify-center items-center my-4">
+                    <Badge className="bg-blue-100 text-blue-800">
+                    Question {currentQuestionIndex + 1} / {questions.length}
+                    </Badge>
                 </div>
             </Card>
 
@@ -189,7 +224,7 @@ export default function FillTheBlankGame({ questions }: FillTheBlankGameProps) {
                                     option
                                 )
                             }
-                            disabled={isSubmitted} // Disable buttons after submission
+                            disabled={isSubmitted}
                         >
                             {option}
                         </Button>
@@ -207,13 +242,23 @@ export default function FillTheBlankGame({ questions }: FillTheBlankGameProps) {
 
             {renderResults()}
 
-            {isSubmitted && currentQuestionIndex < questions.length - 1 && (
+            {isSubmitted && (
                 <Button
                     ref={nextQuestionRef}
-                    className="w-full bg-green-500 text-white py-2"
-                    onClick={handleNextQuestion}
+                    className={`w-full py-2 ${
+                        currentQuestionIndex < questions.length - 1
+                            ? "bg-green-500 text-white"
+                            : "bg-red-300 text-red-800"
+                    }`}
+                    onClick={
+                        currentQuestionIndex < questions.length - 1
+                            ? handleNextQuestion
+                            : () => setCompleted(true)
+                    }
                 >
-                    Next Question
+                    {currentQuestionIndex < questions.length - 1
+                        ? "Next Question"
+                        : "Exit Now"}
                 </Button>
             )}
         </div>

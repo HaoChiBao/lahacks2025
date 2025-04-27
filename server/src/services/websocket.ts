@@ -154,6 +154,29 @@ class Custom_WSS {
                 }
                 break;
 
+            case "updateGameScore":
+                if (ws.room_id) {
+                    const room = this.rooms.rooms[ws.room_id];
+                    if (room) {
+                        room.state.client_state[ws.id].score = payload.score;
+                        this.sendMessage({
+                            type: "updateGameScore",
+                            payload: { room_id: ws.room_id, score: payload.score },
+                        }, ws);
+                    } else {
+                        this.sendMessage({
+                            type: "error",
+                            payload: { message: "Room does not exist" },
+                        }, ws);
+                    }
+                } else {
+                    this.sendMessage({
+                        type: "error",
+                        payload: { message: "Client is not in a room" },
+                    }, ws);
+                }
+                break;
+
             case "createRoom":
                 const room_id = this.rooms.createRoom(null);
                 const join = this.rooms.joinRoom(room_id, ws);

@@ -60,28 +60,32 @@ applyConfiguration(partialSettings);
 export default function Game() {
   const [gameMode, setGameMode] = useState<"spot" | "fill" | null>(null);
 
+  const [gameScore, setGameScore] = useState(0); // State to hold the game score
+
+  const [completed, setCompleted] = useState(false); // State to track if the game is completed
+
   if (!gameMode) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-[#f9fafb] text-gray-800 px-4">
-      <h2 className="text-3xl md:text-4xl font-extrabold mb-8 text-center">
-        Choose Your Game Mode
-      </h2>
+        <h2 className="text-3xl md:text-4xl font-extrabold mb-8 text-center">
+          Choose Your Game Mode
+        </h2>
 
-      <div className="flex flex-col md:flex-row gap-4 md:gap-6 w-full max-w-md md:max-w-none justify-center items-center">
-        <Button
-        onClick={() => setGameMode("spot")}
-        className="rounded-lg bg-gray-200 px-6 py-4 md:px-10 md:py-6 text-base md:text-lg font-semibold text-gray-700 hover:bg-pink-400 hover:text-white hover:shadow-lg hover:scale-105 transition-all duration-300 ease-out w-full max-w-xs"
-        >
-        Spot the Difference
-        </Button>
+        <div className="flex flex-col md:flex-row gap-4 md:gap-6 w-full max-w-md md:max-w-none justify-center items-center">
+          <Button
+            onClick={() => setGameMode("spot")}
+            className="rounded-lg bg-gray-200 px-6 py-4 md:px-10 md:py-6 text-base md:text-lg font-semibold text-gray-700 hover:bg-pink-400 hover:text-white hover:shadow-lg hover:scale-105 transition-all duration-300 ease-out w-full max-w-xs"
+          >
+            Spot the Difference
+          </Button>
 
-        <Button
-        onClick={() => setGameMode("fill")}
-        className="rounded-lg bg-gray-200 px-6 py-4 md:px-10 md:py-6 text-base md:text-lg font-semibold text-gray-700 hover:bg-purple-400 hover:text-white hover:shadow-lg hover:scale-105 transition-all duration-300 ease-out w-full max-w-xs"
-        >
-        Fill in the Blanks
-        </Button>
-      </div>
+          <Button
+            onClick={() => setGameMode("fill")}
+            className="rounded-lg bg-gray-200 px-6 py-4 md:px-10 md:py-6 text-base md:text-lg font-semibold text-gray-700 hover:bg-purple-400 hover:text-white hover:shadow-lg hover:scale-105 transition-all duration-300 ease-out w-full max-w-xs"
+          >
+            Fill in the Blanks
+          </Button>
+        </div>
       </div>
     );
   }
@@ -91,8 +95,36 @@ export default function Game() {
     return <SpotTheDifferenceGame mode="single" />;
   }
 
-  if (gameMode === "fill") {
-    return <FillTheBlankGame questions = {questions}/>;
+  if (gameMode === "fill" && !completed) {
+    return <FillTheBlankGame score={gameScore} setScore={setGameScore} setCompleted={setCompleted} questions={questions} />;
+  } else if (gameMode === "fill" && completed) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-[#f9fafb] text-gray-800 px-4">
+        <h2 className="text-3xl md:text-4xl font-extrabold mb-8 text-center">
+          Game Over! Your Score: {gameScore}
+        </h2>
+        <div className="flex flex-col md:flex-row gap-4">
+          <Button
+            onClick={() => {
+              setGameMode(null); // Reset game mode to null to show the selection screen again
+              setGameScore(0); // Reset score for the next game
+              setCompleted(false); // Reset completed state for the next game
+            }}
+            className="rounded-lg bg-blue-500 px-6 py-4 md:px-10 md:py-6 text-base md:text-lg font-semibold text-white hover:bg-blue-600 hover:shadow-lg hover:scale-105 transition-all duration-300 ease-out"
+          >
+            Play Again
+          </Button>
+          <Button
+            onClick={() => {
+              window.location.href = "/"; // Redirect to home page
+            }}
+            className="rounded-lg bg-gray-200 px-6 py-4 md:px-10 md:py-6 text-base md:text-lg font-semibold text-gray-700 hover:bg-gray-300 hover:shadow-lg hover:scale-105 transition-all duration-300 ease-out"
+          >
+            Go Home
+          </Button>
+        </div>
+      </div>
+    );
   }
 
   return null;
