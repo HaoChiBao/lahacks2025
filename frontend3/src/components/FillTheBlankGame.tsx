@@ -38,8 +38,6 @@ export default function FillTheBlankGame({
 
   const [selectedAnswers, setSelectedAnswers] = useState<Record<string, { option: string; optionIndex: number }>>({});
 
-  const [currentPlaceholders, setCurrentPlaceholders] = useState(0);
-
   const currentQuestion = questions[currentQuestionIndex];
 
   useEffect(() => {
@@ -141,8 +139,7 @@ export default function FillTheBlankGame({
     return currentQuestion.code.split("\n").map((line, index) => {
       const placeholders = line.match(/<option: \d+>/g) || [];
       let processedLine = line;
-  
-      setCurrentPlaceholders(placeholders.length);
+
       placeholders.forEach((placeholder) => {
         const placeholderNumber = placeholder.match(/\d+/)?.[0] || "";
         const selected = selectedAnswers[placeholderNumber];
@@ -178,7 +175,8 @@ export default function FillTheBlankGame({
   const renderResults = () => {
     if (!isSubmitted) return null;
 
-    const total = currentQuestion.options.length;
+    // const total = currentQuestion.options.length;
+    const total = Object.keys(selectedAnswers).length; // Total number of placeholders filled
     const correct = Object.keys(selectedAnswers).filter(
       (key) => selectedAnswers[key].option === currentQuestion.options[Number(key) - 1]
     ).length;
@@ -213,7 +211,7 @@ export default function FillTheBlankGame({
             }`}
           >
             {/* <span className="font-bold">Correct:</span> {correct} / {total} ({percentage.toFixed(1)}%) */}
-            <span className="font-bold">Correct:</span> {correct} / {currentPlaceholders} ({percentage.toFixed(1)}%)
+            <span className="font-bold">Correct:</span> {correct} / {total} ({percentage.toFixed(1)}%)
           </p>
           <p
             className={`text-lg ${
