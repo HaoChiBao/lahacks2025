@@ -10,15 +10,16 @@ export default function GameOverPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const [showConfetti, setShowConfetti] = useState(true);
-  setShowConfetti(true)
 
-  // Parse URL parameters
+  // 🛠 Correct: Parse from query string (NOT state!)
   const searchParams = new URLSearchParams(location.search);
   const score = parseInt(searchParams.get("score") || "0", 10);
   const level = searchParams.get("level") || "beginner";
   const mode = searchParams.get("mode") || "single";
   const correctAnswers = parseInt(searchParams.get("correct") || "0", 10);
   const totalQuestions = parseInt(searchParams.get("total") || "0", 10);
+
+  const accuracy = totalQuestions > 0 ? Math.round((correctAnswers / totalQuestions) * 100) : 0;
 
   useEffect(() => {
     if (score > 0) {
@@ -76,14 +77,17 @@ export default function GameOverPage() {
     }
   };
 
+  const handleShare = () => {
+    navigator.clipboard.writeText(`I scored ${score} points in Code Difference Spotter!`);
+    alert("Score copied to clipboard!");
+  };
+
   const getPerformanceMessage = () => {
     if (score > 500) return "Outstanding! You have a keen eye for code details!";
     if (score > 300) return "Great job! Your debugging skills are impressive!";
     if (score > 100) return "Good work! Keep practicing to improve your skills!";
     return "Nice try! With more practice, you'll spot differences faster!";
   };
-
-  const accuracy = totalQuestions > 0 ? Math.round((correctAnswers / totalQuestions) * 100) : 0;
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-[#f9fafb] p-4">
@@ -142,10 +146,7 @@ export default function GameOverPage() {
             <Button
               variant="ghost"
               className="w-full text-gray-600 hover:text-blue-500"
-              onClick={() => {
-                navigator.clipboard.writeText(`I scored ${score} points in Code Difference Spotter!`);
-                alert("Score copied to clipboard!");
-              }}
+              onClick={handleShare}
             >
               <Share2 className="mr-2 h-4 w-4" />
               Share Score

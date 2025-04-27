@@ -6,14 +6,11 @@ interface CodeSnippet {
   explanation: string
 }
 
-interface CodeSnippets {
+export interface CodeSnippets {
   [level: string]: CodeSnippet[]
 }
 
-export // Extended Code Snippets Collection
-// 15 questions per difficulty level (5 each for JavaScript, Python, and Java)
-
-const extendedCodeSnippets = {
+export const codeSnippets: CodeSnippets = {
   beginner: [
     // JavaScript Beginner Examples
     {

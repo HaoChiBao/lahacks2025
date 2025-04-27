@@ -1,17 +1,27 @@
-import { useState } from "react";
+import { useState, ChangeEvent } from "react";
 import { Button } from "../../components/ui/button";
-import SpotTheDifferenceGame from "../../components/SpotTheDifferenceGame"; 
-import FillTheBlankGame from "../../components/FillTheBlankGame";  
+import SpotTheDifferenceGame from "../../components/SpotTheDifferenceGame";
+import FillTheBlankGame from "../../components/FillTheBlankGame";
+
+type GameMode = "spot" | "fill" | null;
+type Screen = "mode-selection" | "settings-selection" | "game";
 
 export default function Game() {
-  const [gameMode, setGameMode] = useState(null);  // "spot" or "fill"
-  const [language, setLanguage] = useState("");
-  const [difficulty, setDifficulty] = useState("");
-  
-  const [screen, setScreen] = useState("mode-selection"); // "mode-selection" -> "settings-selection" -> "game"
+  const [gameMode, setGameMode] = useState<GameMode>(null);
+  const [language, setLanguage] = useState<string>("");
+  const [difficulty, setDifficulty] = useState<string>("");
+  const [screen, setScreen] = useState<Screen>("mode-selection");
 
   const handleStartGame = () => {
     setScreen("game");
+  };
+
+  const handleLanguageChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    setLanguage(e.target.value);
+  };
+
+  const handleDifficultyChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    setDifficulty(e.target.value);
   };
 
   if (screen === "mode-selection") {
@@ -51,7 +61,7 @@ export default function Game() {
           {/* Language Select */}
           <select
             value={language}
-            onChange={(e) => setLanguage(e.target.value)}
+            onChange={handleLanguageChange}
             className="rounded-lg border-gray-300 text-gray-700 py-3 px-4 bg-white shadow-md"
           >
             <option value="">Select Language</option>
@@ -63,7 +73,7 @@ export default function Game() {
           {/* Difficulty Select */}
           <select
             value={difficulty}
-            onChange={(e) => setDifficulty(e.target.value)}
+            onChange={handleDifficultyChange}
             className="rounded-lg border-gray-300 text-gray-700 py-3 px-4 bg-white shadow-md"
           >
             <option value="">Select Difficulty</option>

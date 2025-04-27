@@ -6,13 +6,12 @@ import { Label } from "../components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
 
 export default function ChooseOptionsPage() {
-  const [language, setLanguage] = useState("");
-  const [difficulty, setDifficulty] = useState("");
+  const [language, setLanguage] = useState<string>("");
+  const [difficulty, setDifficulty] = useState<string>("");
   const navigate = useNavigate();
 
   const handleStartGame = () => {
     if (language && difficulty) {
-      // Navigate to game page with selected settings
       navigate(`/game/spot?language=${language}&difficulty=${difficulty}`);
     }
   };
@@ -23,19 +22,18 @@ export default function ChooseOptionsPage() {
         <CardHeader className="text-center">
           <CardTitle className="text-3xl font-bold text-gray-800">Set Up Your Challenge</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-6">
 
+        <CardContent className="space-y-6">
           {/* Language Selector */}
           <div className="space-y-2">
             <Label className="text-gray-700">Choose a Language</Label>
-            <Select onValueChange={setLanguage}>
+            <Select onValueChange={(value: string) => setLanguage(value)}>
               <SelectTrigger className="bg-gray-100 text-gray-700">
                 <SelectValue placeholder="Select Language" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="javascript">JavaScript</SelectItem>
                 <SelectItem value="python">Python</SelectItem>
-                {/* Add more languages if needed */}
               </SelectContent>
             </Select>
           </div>
@@ -43,7 +41,7 @@ export default function ChooseOptionsPage() {
           {/* Difficulty Selector */}
           <div className="space-y-2">
             <Label className="text-gray-700">Choose a Difficulty</Label>
-            <Select onValueChange={setDifficulty}>
+            <Select onValueChange={(value: string) => setDifficulty(value)}>
               <SelectTrigger className="bg-gray-100 text-gray-700">
                 <SelectValue placeholder="Select Difficulty" />
               </SelectTrigger>
@@ -63,7 +61,6 @@ export default function ChooseOptionsPage() {
           >
             Start Game →
           </Button>
-
         </CardContent>
       </Card>
     </div>

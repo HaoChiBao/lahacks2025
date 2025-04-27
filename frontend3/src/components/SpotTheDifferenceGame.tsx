@@ -1,40 +1,11 @@
 import { useState, useEffect, useRef } from "react";
-<<<<<<< HEAD:frontend3/src/components/SpotTheDifferenceGame.jsx
 import { useNavigate } from "react-router-dom";
-import { CodeBlock } from "../components/ui/CodeBlock";
-import { Button } from "../components/ui/button";
-import { Progress } from "../components/ui/progress";
-import { Badge } from "../components/ui/badge";
-import AnimalFloat from "../components/HerringFloat";
-import { codeSnippets } from "../lib/code-snippets";
-
-const animalModel = "/animals/Sparrow_LOD_All.glb";
-
-export default function SpotTheDifferenceGame({ 
-  mode = "single", 
-  selectedLanguage = "javascript", 
-  selectedDifficulty = "beginner", 
-  playerName = "Player", 
-  players = [], 
-  onGameEnd 
-}) {
-  const navigate = useNavigate();
-
-  // Filter questions based on language and difficulty
-  const matchingSnippets = codeSnippets[selectedDifficulty]?.filter(
-    snippet => snippet.language.toLowerCase() === selectedLanguage.toLowerCase()
-  ) || [];
-
-=======
 import { CodeBlock } from "./ui/CodeBlock";
 import { Button } from "./ui/button";
-import { Tabs, TabsList, TabsTrigger } from "./ui/tabs";
 import { Progress } from "./ui/progress";
 import { Badge } from "./ui/badge";
 import { codeSnippets } from "../lib/code-snippets";
 import AnimalFloat from "./HerringFloat";
-import { useNavigate } from "react-router-dom";
-
 
 const animalModel = "/animals/Sparrow_LOD_All.glb";
 
@@ -42,13 +13,26 @@ interface SpotTheDifferenceGameProps {
   mode?: "single" | "multi";
   playerName?: string;
   players?: string[];
+  selectedLanguage: string;
+  selectedDifficulty: string;
   onGameEnd?: (result: { score: number; correct: number; total: number; level: string }) => void;
 }
 
-// export default function SpotTheDifferenceGame({ mode = "single", playerName = "Player", players = [], onGameEnd }: SpotTheDifferenceGameProps) {
-export default function SpotTheDifferenceGame({ onGameEnd }: SpotTheDifferenceGameProps) {
-  const [currentLevel, setCurrentLevel] = useState("beginner");
->>>>>>> 995f03b225cc87b0696e9a670b99fbacb7f08c80:frontend3/src/components/SpotTheDifferenceGame.tsx
+export default function SpotTheDifferenceGame({
+  mode = "single",
+  playerName = "Player",
+  players = [],
+  selectedLanguage,
+  selectedDifficulty,
+  onGameEnd
+}: SpotTheDifferenceGameProps) {
+  const navigate = useNavigate();
+
+  // ✅ You forgot to add this line!
+  const matchingSnippets = codeSnippets[selectedDifficulty]?.filter(
+    snippet => snippet.language.toLowerCase() === selectedLanguage.toLowerCase()
+  ) || [];
+
   const [currentSnippet, setCurrentSnippet] = useState(0);
   const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(60);
@@ -56,15 +40,7 @@ export default function SpotTheDifferenceGame({ onGameEnd }: SpotTheDifferenceGa
   const [foundDifferences, setFoundDifferences] = useState<number[]>([]);
   const [showExplanation, setShowExplanation] = useState(false);
 
-<<<<<<< HEAD:frontend3/src/components/SpotTheDifferenceGame.jsx
-  const nextPuzzleButtonRef = useRef(null);
-=======
-  const nextPuzzleButtonRef = useRef<HTMLButtonElement | null>(null); // Ref for the "Next Puzzle" button
-
-  const currentPuzzle = codeSnippets[currentLevel][currentSnippet];
-  const totalDifferences = currentPuzzle.differences.length;
-  const navigate = useNavigate();
->>>>>>> 995f03b225cc87b0696e9a670b99fbacb7f08c80:frontend3/src/components/SpotTheDifferenceGame.tsx
+  const nextPuzzleButtonRef = useRef<HTMLButtonElement | null>(null);
 
   const currentPuzzle = matchingSnippets[currentSnippet];
   const totalQuestions = matchingSnippets.length;
@@ -98,7 +74,7 @@ export default function SpotTheDifferenceGame({ onGameEnd }: SpotTheDifferenceGa
 
   const handleLineClick = (lineNumber: number) => {
     if (!gameActive || showExplanation) return;
-    if (currentPuzzle.differences.includes(lineNumber)) {
+    if (currentPuzzle?.differences.includes(lineNumber)) {
       if (!foundDifferences.includes(lineNumber)) {
         setFoundDifferences(prev => [...prev, lineNumber]);
         const points = Math.round(10 * (timeLeft / 60));
@@ -124,9 +100,19 @@ export default function SpotTheDifferenceGame({ onGameEnd }: SpotTheDifferenceGa
       setTimeLeft(60);
     }
   };
+  
 
   const navigateToGameOver = () => {
-    navigate(`/gameover?score=${score}&level=${selectedDifficulty}&mode=${mode}&correct=${currentSnippet + 1}&total=${totalQuestions}`);
+    const correctAnswers = currentSnippet + (showExplanation ? 1 : 0);  // Fix: count if currently in explanation stage
+    navigate(`/gameover`, {
+      state: {
+        score,
+        level: selectedDifficulty,
+        mode,
+        correct: correctAnswers,
+        total: totalQuestions,
+      },
+    });
   };
 
   if (!currentPuzzle) {
@@ -163,10 +149,10 @@ export default function SpotTheDifferenceGame({ onGameEnd }: SpotTheDifferenceGa
         <div className="rounded-xl bg-white shadow p-6">
           <h3 className="font-semibold mb-4 text-gray-700">Incorrect Code</h3>
           <div className="bg-gray-100 p-4 rounded-lg">
-            <CodeBlock 
-              code={currentPuzzle.incorrectCode} 
-              language={currentPuzzle.language} 
-              highlightLines={foundDifferences} 
+            <CodeBlock
+              code={currentPuzzle.incorrectCode}
+              language={currentPuzzle.language}
+              highlightLines={foundDifferences}
               onLineClick={handleLineClick}
             />
           </div>
@@ -175,11 +161,11 @@ export default function SpotTheDifferenceGame({ onGameEnd }: SpotTheDifferenceGa
         <div className="rounded-xl bg-white shadow p-6">
           <h3 className="font-semibold mb-4 text-gray-700">Correct Code</h3>
           <div className="bg-gray-100 p-4 rounded-lg">
-            <CodeBlock 
-              code={currentPuzzle.correctCode} 
-              language={currentPuzzle.language} 
-              highlightLines={foundDifferences} 
-              onLineClick={() => {}} 
+            <CodeBlock
+              code={currentPuzzle.correctCode}
+              language={currentPuzzle.language}
+              highlightLines={foundDifferences}
+              onLineClick={() => {}}
             />
           </div>
         </div>
