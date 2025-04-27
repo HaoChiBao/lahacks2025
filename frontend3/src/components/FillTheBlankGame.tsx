@@ -70,22 +70,24 @@ export default function FillTheBlankGame({
   
     const availablePlaceholders = currentQuestion.code.match(/<option: \d+>/g) || [];
   
-    // Check if the option is already used
+    // Check if this option was already selected
     const usedPlaceholder = Object.entries(selectedAnswers).find(
       ([_, value]) => value.optionIndex === optionIndex
     );
   
     if (usedPlaceholder) {
-      // Deselect
+      // Option was already selected — deselect it
       const placeholderKey = usedPlaceholder[0];
+  
       setSelectedAnswers((prev) => {
         const newAnswers = { ...prev };
         delete newAnswers[placeholderKey];
         return newAnswers;
       });
+  
       setUsedOptionIndexes((prev) => prev.filter((idx) => idx !== optionIndex));
     } else {
-      // Find next empty placeholder
+      // Option not selected yet — select into next available blank
       const filledPlaceholders = Object.keys(selectedAnswers);
       const nextPlaceholder = availablePlaceholders
         .map(ph => ph.match(/\d+/)?.[0])
@@ -97,6 +99,7 @@ export default function FillTheBlankGame({
         ...prev,
         [nextPlaceholder]: { option, optionIndex }
       }));
+  
       setUsedOptionIndexes((prev) => [...prev, optionIndex]);
     }
   };
