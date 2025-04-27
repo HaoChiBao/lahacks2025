@@ -49,11 +49,13 @@ PLACEHOLDER REQUIREMENTS:
 - Never use any other format besides <option: x> for placeholders
 
 OPTION REQUIREMENTS:
-- Provide options in the exact order they appear in the code
+- The number of options MUST EXACTLY MATCH the number of placeholders in the code
+- Provide options in the exact array order corresponding to their placeholder numbers
+- NO DUPLICATE OPTION NAMES - each option string must be unique within its question
 - Keep ALL options SHORT (1-3 words or symbols when possible, maximum 5 words)
 - Include exactly one correct option for each placeholder
 - For distractors, use plausible alternatives that represent common mistakes
-- Ensure no duplicate or empty options
+- Ensure no empty options
 - Make options challenging but fair based on the difficulty level
 
 DESCRIPTION REQUIREMENTS:
@@ -114,10 +116,15 @@ EXAMPLE FORMAT:
 [
   {
     "code": "function <option: 1>(array) {\n  return array.<option: 2>((item) => item * 2);\n}",
-    "options": ["doubleAll", "map", "filter", "forEach"],
+    "options": ["doubleAll", "map"],
     "description": "Creates a function that doubles each element in an array using the appropriate array method."
   }
 ]
+
+CRITICAL VALIDATION RULES:
+1. If there are N placeholders (<option: 1> through <option: N>), there MUST be EXACTLY N options in the options array
+2. All option strings must be unique - NO DUPLICATES allowed within a single question
+3. Options must match the expected length and format for their position in the code
 
 Generate diverse, educational examples that cover different aspects of ${language} programming at ${difficulty} level.
 `.trim();
