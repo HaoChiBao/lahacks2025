@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+<<<<<<< HEAD:frontend3/src/components/SpotTheDifferenceGame.jsx
 import { useNavigate } from "react-router-dom";
 import { CodeBlock } from "../components/ui/CodeBlock";
 import { Button } from "../components/ui/button";
@@ -24,14 +25,46 @@ export default function SpotTheDifferenceGame({
     snippet => snippet.language.toLowerCase() === selectedLanguage.toLowerCase()
   ) || [];
 
+=======
+import { CodeBlock } from "./ui/CodeBlock";
+import { Button } from "./ui/button";
+import { Tabs, TabsList, TabsTrigger } from "./ui/tabs";
+import { Progress } from "./ui/progress";
+import { Badge } from "./ui/badge";
+import { codeSnippets } from "../lib/code-snippets";
+import AnimalFloat from "./HerringFloat";
+import { useNavigate } from "react-router-dom";
+
+
+const animalModel = "/animals/Sparrow_LOD_All.glb";
+
+interface SpotTheDifferenceGameProps {
+  mode?: "single" | "multi";
+  playerName?: string;
+  players?: string[];
+  onGameEnd?: (result: { score: number; correct: number; total: number; level: string }) => void;
+}
+
+// export default function SpotTheDifferenceGame({ mode = "single", playerName = "Player", players = [], onGameEnd }: SpotTheDifferenceGameProps) {
+export default function SpotTheDifferenceGame({ onGameEnd }: SpotTheDifferenceGameProps) {
+  const [currentLevel, setCurrentLevel] = useState("beginner");
+>>>>>>> 995f03b225cc87b0696e9a670b99fbacb7f08c80:frontend3/src/components/SpotTheDifferenceGame.tsx
   const [currentSnippet, setCurrentSnippet] = useState(0);
   const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(60);
   const [gameActive, setGameActive] = useState(true);
-  const [foundDifferences, setFoundDifferences] = useState([]);
+  const [foundDifferences, setFoundDifferences] = useState<number[]>([]);
   const [showExplanation, setShowExplanation] = useState(false);
 
+<<<<<<< HEAD:frontend3/src/components/SpotTheDifferenceGame.jsx
   const nextPuzzleButtonRef = useRef(null);
+=======
+  const nextPuzzleButtonRef = useRef<HTMLButtonElement | null>(null); // Ref for the "Next Puzzle" button
+
+  const currentPuzzle = codeSnippets[currentLevel][currentSnippet];
+  const totalDifferences = currentPuzzle.differences.length;
+  const navigate = useNavigate();
+>>>>>>> 995f03b225cc87b0696e9a670b99fbacb7f08c80:frontend3/src/components/SpotTheDifferenceGame.tsx
 
   const currentPuzzle = matchingSnippets[currentSnippet];
   const totalQuestions = matchingSnippets.length;
@@ -63,7 +96,7 @@ export default function SpotTheDifferenceGame({
     navigateToGameOver();
   };
 
-  const handleLineClick = (lineNumber) => {
+  const handleLineClick = (lineNumber: number) => {
     if (!gameActive || showExplanation) return;
     if (currentPuzzle.differences.includes(lineNumber)) {
       if (!foundDifferences.includes(lineNumber)) {

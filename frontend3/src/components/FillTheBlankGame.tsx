@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { Card } from "./ui/card";
-import AnimalFloat from "./HerringFloat";
+import AnimalFloat from "./HerringFloat.tsx";
 const animalModel = "/animals/Sparrow_LOD_All.glb";
 
 const sampleQuestions = [
@@ -58,12 +58,13 @@ applyConfiguration(partialSettings);
     },
 ];
 
-export default function FillTheBlankGame() {
+// export default function FillTheBlankGame({setGameScore}) {
+export default function FillTheBlankGame({}) {
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-    const [selectedAnswers, setSelectedAnswers] = useState({});
+    const [selectedAnswers, setSelectedAnswers] = useState<Record<string, string>>({});
     const [isSubmitted, setIsSubmitted] = useState(false);
-    const [shuffledOptions, setShuffledOptions] = useState([]);
-    const nextQuestionRef = useRef(null);
+    const [shuffledOptions, setShuffledOptions] = useState<string[]>([]);
+    const nextQuestionRef = useRef<HTMLButtonElement>(null);
 
     const currentQuestion = sampleQuestions[currentQuestionIndex];
 
@@ -74,10 +75,10 @@ export default function FillTheBlankGame() {
         setIsSubmitted(false);
     }, [currentQuestionIndex]);
 
-    const handleOptionSelect = (placeholder, option) => {
+    const handleOptionSelect = (placeholder: string, option: string) => {
         if (isSubmitted) return; // Prevent changes after submission
 
-        setSelectedAnswers((prev) => {
+        setSelectedAnswers((prev: Record<string, string>) => {
             const existingPlaceholder = Object.keys(prev).find(
                 (key) => prev[key] === option
             );
@@ -110,9 +111,10 @@ export default function FillTheBlankGame() {
             let processedLine = line;
 
             placeholders.forEach((placeholder) => {
-                const placeholderNumber = placeholder.match(/\d+/)[0];
+                const match = placeholder.match(/\d+/);
+                const placeholderNumber = match ? match[0] : "";
                 const selectedOption = selectedAnswers[placeholderNumber] || "";
-                const correctOption = currentQuestion.options[placeholderNumber - 1];
+                const correctOption = currentQuestion.options[Number(placeholderNumber) - 1];
 
                 let className = "text-blue-500 border rounded px-1";
                 if (isSubmitted) {
@@ -145,7 +147,7 @@ export default function FillTheBlankGame() {
         const total = currentQuestion.options.length;
         const correct = Object.keys(selectedAnswers).filter(
             (key) =>
-                selectedAnswers[key] === currentQuestion.options[key - 1]
+                selectedAnswers[key] === currentQuestion.options[Number(key) - 1]
         ).length;
         const incorrect = total - correct;
         const percentage = (correct / total) * 100;
@@ -175,8 +177,9 @@ export default function FillTheBlankGame() {
                             let processedLine = line;
 
                             placeholders.forEach((placeholder) => {
-                                const placeholderNumber = placeholder.match(/\d+/)[0];
-                                const correctOption = currentQuestion.options[placeholderNumber - 1];
+                                const match = placeholder.match(/\d+/);
+                                const placeholderNumber = match ? match[0] : "";
+                                const correctOption = currentQuestion.options[Number(placeholderNumber) - 1];
 
                                 processedLine = processedLine.replace(
                                     placeholder,
@@ -225,7 +228,7 @@ export default function FillTheBlankGame() {
                             }`}
                             onClick={() =>
                                 handleOptionSelect(
-                                    Object.keys(selectedAnswers).length + 1,
+                                    String(Object.keys(selectedAnswers).length + 1),
                                     option
                                 )
                             }

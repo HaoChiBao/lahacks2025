@@ -9,9 +9,16 @@ import { Avatar, AvatarFallback } from "../../components/ui/avatar";
 import { CodeBlock } from "../../components/ui/CodeBlock";
 import { codeSnippets } from "../../lib/code-snippets";
 
-export default function RoomSpotDifference({ playerName, roomCode, players, setPlayers, currentLevel }) {
+interface RoomSpotDifferenceProps {
+  playerName: string;
+  players: { id: string; name: string; score: number; avatar: string }[];
+  setPlayers: React.Dispatch<React.SetStateAction<{ id: string; name: string; score: number; avatar: string }[]>>;
+  currentLevel: number;
+}
+
+export default function RoomSpotDifference({ playerName, players, setPlayers, currentLevel }: RoomSpotDifferenceProps) {
   const [currentSnippet, setCurrentSnippet] = useState(0);
-  const [foundDifferences, setFoundDifferences] = useState([]);
+  const [foundDifferences, setFoundDifferences] = useState<number[]>([]);
   const [score, setScore] = useState(0);
   const [lives, setLives] = useState(3);
   const [timeLeft, setTimeLeft] = useState(60);
@@ -34,7 +41,7 @@ export default function RoomSpotDifference({ playerName, roomCode, players, setP
     return () => clearInterval(timer);
   }, []);
 
-  const handleLineClick = (lineNumber) => {
+  const handleLineClick = (lineNumber: number) => {
     if (currentPuzzle.differences.includes(lineNumber)) {
       if (!foundDifferences.includes(lineNumber)) {
         const updated = [...foundDifferences, lineNumber];

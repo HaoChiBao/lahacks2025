@@ -4,15 +4,24 @@ import { ArrowLeft, Users, Copy } from "lucide-react";
 
 import { Button } from "../../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
+
+import FillTheBlankGame from "../../components/FillTheBlankGame";
+
 // Removed unused imports
 // Removed unused imports
+
+interface finalGameSelection {
+  gameMode: string;
+  language: string;
+  difficulty: string;
+}
 
 export default function WaitingRoom() {
   const { code } = useParams();
   const [searchParams] = useSearchParams();
   const playerName = searchParams.get("name") || "Guest";
 
-  const sendClientInfo = (field, value) => {
+  const sendClientInfo = (field: string, value: any) => {
     if (wss && ws_connected) {
       wss.send(
         JSON.stringify({
@@ -23,7 +32,7 @@ export default function WaitingRoom() {
     }
   };
 
-  const [players, setPlayers] = useState([]);
+  const [players, setPlayers] = useState<string[]>([]);
   const [currentUserId, setCurrentUserId] = useState(null);
   const [currentUserState, setCurrentUserState] = useState({
     ready: false,
@@ -33,12 +42,43 @@ export default function WaitingRoom() {
       language: "default",
     },
   });
-  const [gameState, setGameState] = useState({});
+  interface GameState {
+    client_state: {
+      [player: string]: {
+        ready: boolean;
+        choices?: {
+          gameMode?: string;
+          language?: string;
+          difficulty?: string;
+        };
+      };
+    };
+  }
+
+  const [gameState, setGameState] = useState<GameState>({
+    client_state: {},
+  });
   const [step, setStep] = useState(1);
 
-  const [wss, setWss] = useState(null);
+  const [wss, setWss] = useState<WebSocket | null>(null);
   const [ws_connected, setWs_connected] = useState(false);
-  const [clientInfo, setClientInfo] = useState({});
+  interface ClientInfo {
+    ready: number;
+    total: number;
+    gameMode?: number;
+    language?: number;
+    difficulty?: number;
+  }
+
+  const [clientInfo, setClientInfo] = useState<ClientInfo>({
+    ready: 0,
+    total: 0,
+  });
+
+  const [gameStartCountdown, setGameStartCountdown] = useState(0);
+  const [finalGameSelection, setFinalGameSelection] = useState<finalGameSelection>({language: "", gameMode: "", difficulty: ""});
+
+  // const [gameScore, setGameScore] = useState(0);
 
   useEffect(() => {
     const socket = new WebSocket(`ws:${import.meta.env.VITE_API_URL}`);
@@ -69,6 +109,11 @@ export default function WaitingRoom() {
         case "connected":
           setCurrentUserId(message.payload.id);
           break;
+        case "gameSelection":
+          console.log("gameSelection", message.payload);
+          setFinalGameSelection(message.payload);
+          setStep(5);
+          break
         default:
           break;
       }
@@ -85,6 +130,32 @@ export default function WaitingRoom() {
   }, [code, playerName]);
 
   useEffect(() => {
+    if (step === 5) {
+      const gameMode = finalGameSelection?.gameMode || currentUserState.choices.gameMode;
+      const language = finalGameSelection?.language || currentUserState.choices.language;
+      const difficulty = finalGameSelection?.difficulty || currentUserState.choices.difficulty;
+
+      console.log("Final Game Selection", gameMode, language, difficulty);
+
+      setTimeout(() => {
+        setGameStartCountdown(5);
+
+        const loop = setInterval(() => {
+          setGameStartCountdown((prev) => {
+            if (prev <= 0) {
+              clearInterval(loop);
+              setStep(6);
+              return 0;
+            }
+            return prev - 1;
+          });
+        }, 1000);
+      }, 2000);
+
+    }
+  }, [step])
+
+  useEffect(() => {
     const counts = clientInfo;
 
     if (step === 1 && counts.ready === counts.total && counts.total >= 2) {
@@ -97,16 +168,20 @@ export default function WaitingRoom() {
       setStep(4);
     }
     if (step === 4 && counts.difficulty === counts.total) {
-      setStep(5);
+      // setStep(5);
     }
   }, [clientInfo]);
 
   const copyCode = () => {
-    navigator.clipboard.writeText(code);
-    alert("Room code copied!");
+    if (code) {
+      navigator.clipboard.writeText(code);
+      alert("Room code copied!");
+    } else {
+      alert("Room code is unavailable!");
+    }
   };
 
-  const updateUserState = (field, value) => {
+  const updateUserState = (field: string, value: any) => {
     const updatedState = {
       ...currentUserState,
       choices: {
@@ -158,7 +233,7 @@ export default function WaitingRoom() {
         </div>
       </header>
 
-      <main className="flex-1 container mx-auto p-6">
+      <main className="flex-1 container mx-</Button>auto p-6">
         {step === 1 && (
           <div className="max-w-2xl mx-auto">
             <Card className="bg-white shadow-md">
@@ -178,7 +253,7 @@ export default function WaitingRoom() {
                             : "bg-gray-100 text-gray-700"
                         }`}
                       >
-                        <p className="flex items-center justify-between text-sm font-medium">
+                        <p className="flex items-cent</Card>er justify-between text-sm font-medium">
                           {player}
                           <span
                             className={`${
@@ -219,7 +294,7 @@ export default function WaitingRoom() {
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="grid grid-cols-2 gap-4">
-                  {["difference", "fill", "lobby"].map((mode) => (
+                  {["difference", "fill"].map((mode) => (
                     <Button
                       key={mode}
                       onClick={() => updateUserState("gameMode", mode)}
@@ -323,19 +398,76 @@ export default function WaitingRoom() {
             </Card>
           </div>
         )}
+        {/* step 6 is an animation the pops up in order all of the final selection options. this builds anticipation and suspense */}
+        {step === 5 && (
+          <div className="relative flex flex-col items-center justify-center min-h-[80vh] px-4 overflow-hidden">
+            
+            {/* Countdown Overlay */}
+            {gameStartCountdown > 0 && (
+              <div className="absolute inset-0 bg-white/80 backdrop-blur-md flex flex-col items-center justify-center z-20">
+                <p className="text-6xl md:text-8xl font-extrabold text-gray-800">{gameStartCountdown}</p>
+              </div>
+            )}
 
-        { step === 5 && (
-          <div className="max-w-2xl mx-auto">
-            <Card className="bg-white shadow-md">
-              <CardHeader>
-                <CardTitle className="text-gray-700">Game Starting...</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <p className="text-gray-600">All players are ready. The game will start shortly!</p>
-              </CardContent>
-            </Card>
+            {/* Actual Content */}
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-12 text-center z-10">
+              Final Game Setup
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-6xl z-10">
+              
+              {/* Game Mode Card */}
+              <Card className="bg-white rounded-3xl shadow-md hover:shadow-lg transition-all duration-300 flex flex-col items-center justify-center text-center py-12 px-8">
+                <CardHeader className="flex flex-col items-center justify-center">
+                  <CardTitle className="text-gray-800 text-2xl md:text-3xl font-bold mb-4">
+                    Game Mode
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="flex flex-col items-center justify-center">
+                  <p className="text-2xl md:text-3xl font-semibold text-gray-600 truncate max-w-[14rem]">
+                    {finalGameSelection?.gameMode}
+                  </p>
+                </CardContent>
+              </Card>
+
+              {/* Language Card */}
+              <Card className="bg-white rounded-3xl shadow-md hover:shadow-lg transition-all duration-300 flex flex-col items-center justify-center text-center py-12 px-8">
+                <CardHeader className="flex flex-col items-center justify-center">
+                  <CardTitle className="text-gray-800 text-2xl md:text-3xl font-bold mb-4">
+                    Language
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="flex flex-col items-center justify-center">
+                  <p className="text-2xl md:text-3xl font-semibold text-gray-600 truncate max-w-[14rem]">
+                    {finalGameSelection?.language}
+                  </p>
+                </CardContent>
+              </Card>
+
+              {/* Difficulty Card */}
+              <Card className="bg-white rounded-3xl shadow-md hover:shadow-lg transition-all duration-300 flex flex-col items-center justify-center text-center py-12 px-8">
+                <CardHeader className="flex flex-col items-center justify-center">
+                  <CardTitle className="text-gray-800 text-2xl md:text-3xl font-bold mb-4">
+                    Difficulty
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="flex flex-col items-center justify-center">
+                  <p className="text-2xl md:text-3xl font-semibold text-gray-600 truncate max-w-[14rem]">
+                    {finalGameSelection?.difficulty}
+                  </p>
+                </CardContent>
+              </Card>
+
+            </div>
           </div>
         )}
+
+        {step === 6 && (
+          <div className="max-w-2xl mx-auto">
+            {/* <FillTheBlankGame setGameScore={setGameScore} /> */}
+            <FillTheBlankGame />
+          </div>
+        )}
+
       </main>
 
       <ConnectionStatus />

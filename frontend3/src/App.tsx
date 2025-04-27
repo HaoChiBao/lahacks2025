@@ -1,13 +1,13 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import HomePage from "./pages/HomePage.jsx";
-import Game from "./pages/GameModes/GameSelector.jsx"; // 💬 this is your new Game mode selector
-import MultiplayerPage from "./pages/Multiplayer.jsx";
-import LeaderboardPage from "./pages/Leaderboard.jsx";
+import HomePage from "./pages/HomePage.js";
+import Game from "./pages/GameModes/Game.js"; // 💬 this is your new Game mode selector
+import MultiplayerPage from "./pages/Multiplayer.js";
+// import LeaderboardPage from "./pages/Leaderboard.js";
 import HowToPlayPage from "./pages/HowToPlay.jsx";
-import GameOverPage from "./pages/GameOver.jsx";
-import WaitingRoomPage from "./pages/Multiplayer/WaitingRoom.jsx"
-import RoomSpotDifference from "./pages/Multiplayer/RoomSpotDifference.jsx"; // ⭐ added Room game page separately
-import GlobalLeaderboard from "./pages/GlobalLeaderboard.jsx";
+import GameOverPage from "./pages/GameOver.js";
+import WaitingRoomPage from "./pages/Multiplayer/WaitingRoom.js"
+// import RoomSpotDifference from "./pages/Multiplayer/RoomSpotDifference"; // ⭐ added Room game page separately
+import GlobalLeaderboard from "./pages/GlobalLeaderboard.js";
 
 
 function App() {
@@ -23,7 +23,7 @@ function App() {
         
         <Route path="/gameover" element={<GameOverPage />} /> {/* ⭐ Added this */}
         <Route path="/multiplayer/room/:code" element={<WaitingRoomPage />} /> {/* ✅ this line */}
-        <Route path="/multiplayer/room/:code/spot" element={<RoomSpotDifference />} /> {/* 🔥 separate in-room game */}
+        {/* <Route path="/multiplayer/room/:code/spot" element={<RoomSpotDifference />} /> */}
 
       </Routes>
     </Router>

@@ -1,16 +1,18 @@
 import { useRef } from "react";
 import { Canvas, useFrame, useLoader } from "@react-three/fiber";
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+import { GLTFLoader } from "three-stdlib";
 import { Environment } from "@react-three/drei"; // notice: no CameraControls now
 
-function FloatingAnimal({ modelPath }) {
-  const ref = useRef();
+import * as THREE from "three";
+
+function FloatingAnimal({ modelPath }: { modelPath: string }) {
+  const ref = useRef<THREE.Object3D>(null);
   const { scene } = useLoader(GLTFLoader, modelPath);
 
   useFrame(({ clock }) => {
     if (ref.current) {
-      ref.current.position.y = Math.sin(clock.elapsedTime * 2) * 0.5; // gentle bob
-      ref.current.rotation.y += 0.003; // slow spin
+      (ref.current.position as THREE.Vector3).y = Math.sin(clock.elapsedTime * 2) * 0.5; // gentle bob
+      (ref.current.rotation as THREE.Euler).y += 0.003; // slow spin
     }
   });
 

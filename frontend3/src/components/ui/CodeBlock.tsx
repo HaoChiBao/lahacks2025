@@ -10,7 +10,8 @@ interface CodeBlockProps {
   onLineClick?: (lineNumber: number) => void
 }
 
-export function CodeBlock({ code, language, highlightLines = [], onLineClick }: CodeBlockProps) {
+// export function CodeBlock({ code, language, highlightLines = [], onLineClick }: CodeBlockProps) {
+export function CodeBlock({ code, highlightLines = [], onLineClick }: CodeBlockProps) {
   const [hoveredLine, setHoveredLine] = useState<number | null>(null)
 
   const lines = code.split("\n")

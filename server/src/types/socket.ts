@@ -1,4 +1,4 @@
-type GameModes = 'difference' | 'fill' | 'lobby' | 'default';
+type GameModes = 'difference' | 'fill' | 'default';
 type Difficulty = 'Beginner' | 'Intermediate' | 'Advanced' | 'default';
 type Language = 'JavaScript' | 'Python' | 'Java' | 'C++' | 'C#' | 'Go' | 'Ruby' | 'PHP' | 'Swift' | 'TypeScript' | 'default';
 

@@ -2,6 +2,8 @@ import { SocketRoom } from "../types/socket"
 
 import { Difficulty, Language, GameModes } from "../types/socket"
 
+import { generateFillInTheBlank } from "./generateQuestions"
+
 class SocketRooms {
     rooms: SocketRoom
     constructor() {
@@ -17,7 +19,7 @@ class SocketRooms {
         if(!room_id) room_id = this.generateRoomId()
         if (!this.rooms[room_id]) {
             this.rooms[room_id] = {
-                mode: 'lobby',
+                mode: 'default',
                 loop: this.roomLoop(room_id),
                 state: {
                     in_progress: false,
@@ -74,7 +76,8 @@ class SocketRooms {
                     options.gameMode[choices.gameMode] = (options.gameMode[choices.gameMode] || 0) + 1;
                 }
 
-                if (clientInfo.difficulty === clientInfo.total && clientInfo.language === clientInfo.total && clientInfo.gameMode === clientInfo.total) {
+                if (clientInfo.difficulty === clientInfo.total && clientInfo.language === clientInfo.total && clientInfo.gameMode === clientInfo.total && this.rooms[room_id].mode === 'default') {
+
                     
                     // Helper function to determine the most selected option or break ties randomly
                     const selectOption = (optionCounts: Record<string, number>) => {
@@ -92,6 +95,19 @@ class SocketRooms {
                     this.rooms[room_id].state.difficulty = finalState.difficulty as Difficulty;
                     this.rooms[room_id].state.language = finalState.language as Language;
                     this.rooms[room_id].mode = finalState.gameMode as GameModes;
+
+                    console.log("Final State", finalState)
+                    // send message to all clients with the final state
+                    for (const ws in clients) {
+                        if (clients[ws].readyState === clients[ws].OPEN) {
+                            this.rooms[room_id].clients[ws].send(JSON.stringify({
+                                type: 'gameSelection',
+                                payload: finalState
+                            }))
+                        } else {
+                            console.log("Client not open")
+                        }
+                    }
                 }
 
             }

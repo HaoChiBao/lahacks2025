@@ -2,8 +2,6 @@
 
 import express from 'express'
 
-import { generateQuestionPrompt, GeneratedQuestion } from '../services/generateQuestions'
-
 const router = express.Router()
 
 // random post request
@@ -24,10 +22,9 @@ router.post('/example', async (req, res) => {
 router.get('/test', async (req, res) => {
     try {
 
-        const response:GeneratedQuestion[] = await generateQuestionPrompt("JavaScript", "Intermediate", 5)
         // const data = response
-        // res.status(200).json({status: 'cool test'})
-        res.status(200).json({response})
+        res.status(200).json({status: 'cool test'})
+        // res.status(200).json({response})
     } catch (e:any) {
         console.warn("Error", e)
         res.status(500).json({error: e.message || "server error"})
