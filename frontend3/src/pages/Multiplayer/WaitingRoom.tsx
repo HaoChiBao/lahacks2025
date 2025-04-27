@@ -10,12 +10,18 @@ import FillTheBlankGame from "../../components/FillTheBlankGame";
 // Removed unused imports
 // Removed unused imports
 
+interface finalGameSelection {
+  gameMode: string;
+  language: string;
+  difficulty: string;
+}
+
 export default function WaitingRoom() {
   const { code } = useParams();
   const [searchParams] = useSearchParams();
   const playerName = searchParams.get("name") || "Guest";
 
-  const sendClientInfo = (field, value) => {
+  const sendClientInfo = (field: string, value: any) => {
     if (wss && ws_connected) {
       wss.send(
         JSON.stringify({
@@ -26,7 +32,7 @@ export default function WaitingRoom() {
     }
   };
 
-  const [players, setPlayers] = useState([]);
+  const [players, setPlayers] = useState<string[]>([]);
   const [currentUserId, setCurrentUserId] = useState(null);
   const [currentUserState, setCurrentUserState] = useState({
     ready: false,
@@ -36,17 +42,43 @@ export default function WaitingRoom() {
       language: "default",
     },
   });
-  const [gameState, setGameState] = useState({});
+  interface GameState {
+    client_state: {
+      [player: string]: {
+        ready: boolean;
+        choices?: {
+          gameMode?: string;
+          language?: string;
+          difficulty?: string;
+        };
+      };
+    };
+  }
+
+  const [gameState, setGameState] = useState<GameState>({
+    client_state: {},
+  });
   const [step, setStep] = useState(1);
 
-  const [wss, setWss] = useState(null);
+  const [wss, setWss] = useState<WebSocket | null>(null);
   const [ws_connected, setWs_connected] = useState(false);
-  const [clientInfo, setClientInfo] = useState({});
+  interface ClientInfo {
+    ready: number;
+    total: number;
+    gameMode?: number;
+    language?: number;
+    difficulty?: number;
+  }
+
+  const [clientInfo, setClientInfo] = useState<ClientInfo>({
+    ready: 0,
+    total: 0,
+  });
 
   const [gameStartCountdown, setGameStartCountdown] = useState(0);
-  const [finalGameSelection, setFinalGameSelection] = useState({});
+  const [finalGameSelection, setFinalGameSelection] = useState<finalGameSelection>({language: "", gameMode: "", difficulty: ""});
 
-  const [gameScore, setGameScore] = useState(0);
+  // const [gameScore, setGameScore] = useState(0);
 
   useEffect(() => {
     const socket = new WebSocket(`ws:${import.meta.env.VITE_API_URL}`);
@@ -103,6 +135,8 @@ export default function WaitingRoom() {
       const language = finalGameSelection?.language || currentUserState.choices.language;
       const difficulty = finalGameSelection?.difficulty || currentUserState.choices.difficulty;
 
+      console.log("Final Game Selection", gameMode, language, difficulty);
+
       setTimeout(() => {
         setGameStartCountdown(5);
 
@@ -139,11 +173,15 @@ export default function WaitingRoom() {
   }, [clientInfo]);
 
   const copyCode = () => {
-    navigator.clipboard.writeText(code);
-    alert("Room code copied!");
+    if (code) {
+      navigator.clipboard.writeText(code);
+      alert("Room code copied!");
+    } else {
+      alert("Room code is unavailable!");
+    }
   };
 
-  const updateUserState = (field, value) => {
+  const updateUserState = (field: string, value: any) => {
     const updatedState = {
       ...currentUserState,
       choices: {
@@ -425,7 +463,8 @@ export default function WaitingRoom() {
 
         {step === 6 && (
           <div className="max-w-2xl mx-auto">
-            <FillTheBlankGame mode="multiplayer" setGameScore={setGameScore} />
+            {/* <FillTheBlankGame setGameScore={setGameScore} /> */}
+            <FillTheBlankGame />
           </div>
         )}
 
