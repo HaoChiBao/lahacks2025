@@ -2,18 +2,18 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, Clock, Code2, Heart } from "lucide-react";
 import { Button } from "../../components/ui/button";
-import { Tabs, TabsList, TabsTrigger } from "../../components/ui/tabs";
-import { Badge } from "../../components/ui/badge";
+// import { Tabs, TabsList, TabsTrigger } from "../../components/ui/tabs";
+// import { Badge } from "../../components/ui/badge";
 import { Progress } from "../../components/ui/progress";
 import { CodeBlock } from "../../components/ui/CodeBlock";
-import { AnimalFloat } from "../../components/HerringFloat";
+import AnimalFloat from "../../components/HerringFloat";
 import { codeSnippets } from "../../lib/code-snippets";
 
-const animalModels = [
-  "/animals/Herring_LOD_All.glb",
-  "/animals/Sparrow_LOD_All.glb",
-  "/animals/Pudu_LOD_All.glb",
-];
+// const animalModels = [
+//   "/animals/Herring_LOD_All.glb",
+//   "/animals/Sparrow_LOD_All.glb",
+//   "/animals/Pudu_LOD_All.glb",
+// ];
 
 export default function SpotTheDifference() {
   const [difficultySelected, setDifficultySelected] = useState(false);  // NEW
@@ -23,7 +23,7 @@ export default function SpotTheDifference() {
   const [lives, setLives] = useState(3);
   const [timeLeft, setTimeLeft] = useState(60);
   const [gameActive, setGameActive] = useState(true);
-  const [foundDifferences, setFoundDifferences] = useState([]);
+  const [foundDifferences, setFoundDifferences] = useState<number[]>([]);
   const [showExplanation, setShowExplanation] = useState(false);
   const [wasAnswerCorrect, setWasAnswerCorrect] = useState(true);
 
@@ -57,11 +57,11 @@ export default function SpotTheDifference() {
     }
   };
 
-  const handleLineClick = (lineNumber) => {
+  const handleLineClick = (lineNumber: number) => {
     if (!gameActive || showExplanation) return;
     if (currentPuzzle.differences.includes(lineNumber)) {
       if (!foundDifferences.includes(lineNumber)) {
-        const newFound = [...foundDifferences, lineNumber];
+        const newFound: number[] = [...foundDifferences, lineNumber];
         setFoundDifferences(newFound);
         const difficultyMultiplier = currentLevel === "beginner" ? 1 : currentLevel === "intermediate" ? 2 : 3;
         const points = Math.round(10 * difficultyMultiplier * (timeLeft / 60));
@@ -192,7 +192,6 @@ export default function SpotTheDifference() {
         language={currentPuzzle.language}
         highlightLines={foundDifferences}
         onLineClick={handleLineClick}
-        theme="light"
         />
         </div>
         </div>
@@ -206,7 +205,6 @@ export default function SpotTheDifference() {
         language={currentPuzzle.language}
         highlightLines={foundDifferences}
         onLineClick={handleLineClick}
-        theme="light"
         />
         </div>
         </div>

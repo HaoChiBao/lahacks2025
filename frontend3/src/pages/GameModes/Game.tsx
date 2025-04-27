@@ -4,7 +4,7 @@ import SpotTheDifferenceGame from "../../components/SpotTheDifferenceGame"; // â
 import FillTheBlankGame from "../../components/FillTheBlankGame";         // âœ… REUSABLE
 
 export default function Game() {
-  const [gameMode, setGameMode] = useState(null);
+  const [gameMode, setGameMode] = useState<"spot" | "fill" | null>(null);
 
   if (!gameMode) {
     return (
@@ -38,7 +38,7 @@ export default function Game() {
   }
 
   if (gameMode === "fill") {
-    return <FillTheBlankGame mode="single" />;
+    return <FillTheBlankGame />;
   }
 
   return null;

@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import HomePage from "./pages/HomePage.js";
-import Game from "./pages/GameModes/Game.jsx"; // 💬 this is your new Game mode selector
+import Game from "./pages/GameModes/Game.js"; // 💬 this is your new Game mode selector
 import MultiplayerPage from "./pages/Multiplayer.js";
 import LeaderboardPage from "./pages/Leaderboard.js";
 import HowToPlayPage from "./pages/HowToPlay.jsx";
