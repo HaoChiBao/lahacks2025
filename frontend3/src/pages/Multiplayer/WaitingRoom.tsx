@@ -6,6 +6,9 @@ import { Button } from "../../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 
 import FillTheBlankGame from "../../components/FillTheBlankGame";
+import { QRCodeCanvas } from "qrcode.react"; // ✅ ADD THIS import
+import { RoomQRCode } from "../../components/RoomQRCode";
+
 
 // Removed unused imports
 // Removed unused imports
@@ -222,18 +225,15 @@ export default function WaitingRoom() {
               <ArrowLeft className="h-5 w-5 text-gray-600" />
             </Button>
           </Link>
-          <div className="flex items-center gap-2">
-            <h1 className="text-lg font-semibold text-gray-700">Room: {code}</h1>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={copyCode}
-              className="h-7 w-7 p-0 bg-gray-200 text-gray-600"
-            >
-              <Copy className="h-4 w-4" />
-            </Button>
+          <div className="flex items-center gap-4">
+          <div className="flex flex-col items-center space-y-2">
+  <h1 className="text-sm font-semibold text-gray-700">Room Code</h1>
+  <p className="text-lg font-bold text-blue-600">{code}</p> {/* <-- Show code normally */}
+  <RoomQRCode code={code || ""} /> {/* <-- Then the button for QR */}
+</div>
+
           </div>
-        </div>
+</div>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-1">
             <Users className="h-5 w-5 text-gray-600" />
