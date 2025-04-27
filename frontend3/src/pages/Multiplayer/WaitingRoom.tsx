@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useSearchParams, Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, Users, Copy } from "lucide-react";
+import { ArrowLeft, Users } from "lucide-react";
 
 import { Button } from "../../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
@@ -240,14 +240,14 @@ export default function WaitingRoom() {
     }
   }, [clientInfo]);
 
-  const copyCode = () => {
-    if (code) {
-      navigator.clipboard.writeText(code);
-      alert("Room code copied!");
-    } else {
-      alert("Room code is unavailable!");
-    }
-  };
+  // const copyCode = () => {
+  //   if (code) {
+  //     navigator.clipboard.writeText(code);
+  //     alert("Room code copied!");
+  //   } else {
+  //     alert("Room code is unavailable!");
+  //   }
+  // };
 
   const updateUserState = (field: string, value: any) => {
     const updatedState = {

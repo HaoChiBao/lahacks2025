@@ -101,7 +101,7 @@ export default function Game() {
     }
 
     if (gameMode === "fill") {
-      return <FillTheBlankGame mode="single" selectedLanguage={language} selectedDifficulty={difficulty} />;
+      // return <FillTheBlankGame mode="single" selectedLanguage={language} selectedDifficulty={difficulty} />;
     }
   }
 

@@ -20,11 +20,11 @@ interface SpotTheDifferenceGameProps {
 
 export default function SpotTheDifferenceGame({
   mode = "single",
-  playerName = "Player",
-  players = [],
+  // playerName = "Player",
+  // players = [],
   selectedLanguage,
   selectedDifficulty,
-  onGameEnd
+  // onGameEnd
 }: SpotTheDifferenceGameProps) {
   const navigate = useNavigate();
 
