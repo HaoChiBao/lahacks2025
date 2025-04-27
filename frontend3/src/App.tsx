@@ -5,6 +5,7 @@ import MultiplayerPage from "./pages/Multiplayer.js";
 // import LeaderboardPage from "./pages/Leaderboard.js";
 import HowToPlayPage from "./pages/HowToPlay.jsx";
 import GameOverPage from "./pages/GameOver.js";
+import MultiplayerGameOver from "./pages/Multiplayer/multiplayerGameOver.js"; // ⭐ Added this
 import WaitingRoomPage from "./pages/Multiplayer/WaitingRoom.js"
 // import RoomSpotDifference from "./pages/Multiplayer/RoomSpotDifference"; // ⭐ added Room game page separately
 import GlobalLeaderboard from "./pages/GlobalLeaderboard.js";
@@ -22,6 +23,8 @@ function App() {
         <Route path="/multiplayer" element={<MultiplayerPage />} />
         
         <Route path="/gameover" element={<GameOverPage />} /> {/* ⭐ Added this */}
+        <Route path="/multiplayer/gameover" element={<MultiplayerGameOver />} /> {/* ⭐ Added this */}
+
         <Route path="/multiplayer/room/:code" element={<WaitingRoomPage />} /> {/* ✅ this line */}
         {/* <Route path="/multiplayer/room/:code/spot" element={<RoomSpotDifference />} /> */}
 

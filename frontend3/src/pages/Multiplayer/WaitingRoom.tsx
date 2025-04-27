@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, useSearchParams, Link } from "react-router-dom";
+import { useParams, useSearchParams, Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, Users, Copy } from "lucide-react";
 
 import { Button } from "../../components/ui/button";
@@ -18,6 +18,7 @@ interface finalGameSelection {
 }
 
 export default function WaitingRoom() {
+  const navigate = useNavigate();
   // get code query param
   const { code } = useParams();
   const [searchParams] = useSearchParams();
@@ -82,12 +83,19 @@ export default function WaitingRoom() {
 
   const [gameQuestions, setGameQuestions] = useState([]);
 
-  const [timerActive, setTimerActive] = useState(false);
-
   const [gameScore, setGameScore] = useState(0);
+  
+  const [clientStates, setClientStates] = useState({});
 
   const [completed, setCompleted] = useState(false); // State to track if the game is completed
 
+  const [questionsAnswered, setQuestionsAnswered] = useState(0); // State to track the number of questions answered
+
+  let timerActive = false; // Flag to track if the timer is active
+
+  useEffect(() => {
+    console.log("User completed game:", completed);
+  }, [completed]);
 
   useEffect(() => {
     const socket = new WebSocket(`ws:${import.meta.env.VITE_API_URL}`);
@@ -116,11 +124,13 @@ export default function WaitingRoom() {
           setClientInfo(message.payload.clientInfo);
           setGameState(message.payload.gameState);
 
+          setClientStates(message.payload.gameState.client_state);
+
           if ((message.payload.gameState.questions).length > 0) {
             setGameQuestions(message.payload.gameState.questions);
 
             if(!timerActive) {
-              setTimerActive(true);
+              timerActive = true; // Set the flag to indicate the timer is active
               setTimeout(() => {
                 setGameStartCountdown(3);
         
@@ -129,7 +139,7 @@ export default function WaitingRoom() {
                     if (prev <= 0) {
                       clearInterval(loop);
                       setStep(6);
-                      setTimerActive(false);
+                      timerActive = false; // Reset the flag when the countdown ends
                       return 0;
                     }
                     return prev - 1;
@@ -142,6 +152,28 @@ export default function WaitingRoom() {
           break;
         case "connected":
           setCurrentUserId(message.payload.id);
+          break;
+        case "gameOver":
+          console.log("gameOver", message.payload);
+          setTimeout(() => {
+
+            // find the player with the highest score and set it as the winner
+            const winner = Object.keys(message.payload.client_state).reduce((prev, curr) => {
+              return message.payload.client_state[curr].score > message.payload.client_state[prev].score ? curr : prev;
+            });
+            const winnerId = winner;
+            const winnerName = message.payload.client_state[winner].name;
+            const winnerScore = message.payload.client_state[winner].score;
+            const winnerQuestionsAnswered = message.payload.client_state[winner].questionsAnswered;
+            const totalQuestions = message.payload.client_state[winner].questionsAnswered;
+            const gameMode = message.payload.client_state[winner].choices.gameMode;
+            const language = message.payload.client_state[winner].choices.language;
+            const difficulty = message.payload.client_state[winner].choices.difficulty;
+  
+            navigate(`/multiplayer/gameover?winnerId=${winnerId}&winnerName=${winnerName}&winnerScore=${winnerScore}&questionsAnswered=${winnerQuestionsAnswered}&totalQuestions=${totalQuestions}&gameMode=${gameMode}&language=${language}&difficulty=${difficulty}&currentUserId=${currentUserId}&room_id=${room_id}`);
+          
+          }, 1000);
+
           break;
         case "gameSelection":
           console.log("gameSelection", message.payload);
@@ -174,6 +206,18 @@ export default function WaitingRoom() {
       );
     }
   }, [gameScore])
+
+  useEffect(() => {
+    // update the game score to the server ws
+    if (wss && ws_connected) {
+      wss.send(
+        JSON.stringify({
+          type: "updateQuestionsAnswered",
+          payload: { questionsAnswered },
+        })
+      );
+    }
+  }, [questionsAnswered]);
 
   useEffect(() => {
     const counts = clientInfo;
@@ -485,20 +529,15 @@ export default function WaitingRoom() {
           <>
             <div className="max-w-2xl mx-auto">
               {/* <FillTheBlankGame setGameScore={setGameScore} /> */}
-              <FillTheBlankGame score = {gameScore} setScore={setGameScore} setCompleted = {setCompleted} questions = {gameQuestions} />
+              <FillTheBlankGame score = {gameScore} setScore={setGameScore} setCompleted = {setCompleted} questions = {gameQuestions} setQuestionsAnswered={setQuestionsAnswered} />
             </div>
               {/* Player Progress Meters (right side) */}
-            <div className="w-full lg:w-1/3 space-y-6">
-            <h2 className="text-2xl font-bold text-gray-700 text-center">Players Progress</h2>
-              <ClientProgressMeter
-                clients={Object.fromEntries(
-                  Object.entries(gameState.client_state).map(([clientId]) => [
-                    clientId,
-                    { score: 0 }, // Default score or replace with actual score logic
-                  ])
-                )}
-                totalQuestions={gameQuestions.length}
-              />
+            <div className="w-full lg:w-1/3 space-y-6 max-w-2xl mx-auto">
+              <h2 className="text-2xl font-bold text-gray-700 text-center">Players Progress</h2>
+                <ClientProgressMeter
+                  clients={clientStates}
+                  totalQuestions={gameQuestions.length}
+                />
             </div>
           </>
         )}

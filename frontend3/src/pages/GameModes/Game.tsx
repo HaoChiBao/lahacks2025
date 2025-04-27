@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "../../components/ui/button";
 import SpotTheDifferenceGame from "../../components/SpotTheDifferenceGame"; // ✅ REUSABLE
 import FillTheBlankGame from "../../components/FillTheBlankGame";         // ✅ REUSABLE
@@ -64,6 +64,12 @@ export default function Game() {
 
   const [completed, setCompleted] = useState(false); // State to track if the game is completed
 
+  const [questionsAnswered, setQuestionsAnswered] = useState(0); // State to track the number of questions answered
+
+  useEffect(() => {
+    console.log("Questions answered:", questionsAnswered); // Log the number of questions answered
+  }, [questionsAnswered]); // Effect to handle side effects when questionsAnswered changes
+
   if (!gameMode) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-[#f9fafb] text-gray-800 px-4">
@@ -96,7 +102,7 @@ export default function Game() {
   }
 
   if (gameMode === "fill" && !completed) {
-    return <FillTheBlankGame score={gameScore} setScore={setGameScore} setCompleted={setCompleted} questions={questions} />;
+    return <FillTheBlankGame score={gameScore} setScore={setGameScore} setCompleted={setCompleted} questions={questions} setQuestionsAnswered = {setQuestionsAnswered} />;
   } else if (gameMode === "fill" && completed) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-[#f9fafb] text-gray-800 px-4">

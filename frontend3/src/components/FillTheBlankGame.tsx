@@ -18,9 +18,10 @@ interface FillTheBlankGameProps {
     score: number;
     setCompleted: React.Dispatch<React.SetStateAction<boolean>>;
     setScore: React.Dispatch<React.SetStateAction<number>>;
+    setQuestionsAnswered: React.Dispatch<React.SetStateAction<number>>;
 }
 
-export default function FillTheBlankGame({ questions, score, setScore, setCompleted }: FillTheBlankGameProps) {
+export default function FillTheBlankGame({ questions, score, setScore, setCompleted, setQuestionsAnswered }: FillTheBlankGameProps) {
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [selectedAnswers, setSelectedAnswers] = useState<Record<string, string>>({});
     const [isSubmitted, setIsSubmitted] = useState(false);
@@ -62,13 +63,7 @@ export default function FillTheBlankGame({ questions, score, setScore, setComple
 
         setScore((prevScore) => prevScore + correct * 10);
 
-        // if (currentQuestionIndex === questions.length - 1) {
-        //     setCompleted(true);
-        // } else {
-        //     setTimeout(() => {
-        //         nextQuestionRef.current?.scrollIntoView({ behavior: "smooth" });
-        //     }, 300);
-        // }
+        setQuestionsAnswered((prev) => prev + 1);
 
         setTimeout(() => {
             nextQuestionRef.current?.scrollIntoView({ behavior: "smooth" });

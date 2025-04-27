@@ -5,7 +5,7 @@ type Language = string | 'JavaScript' | 'Python' | 'Java' | 'C++' | 'C#' | 'Go' 
 interface ClientGameState {
     ready: boolean;
     score: number;
-    
+    questionsAnswered: number;
     choices: {
         gameMode: GameModes;
         difficulty: Difficulty;

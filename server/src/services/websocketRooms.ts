@@ -60,7 +60,7 @@ class SocketRooms {
 
             // check if clientInfo is all ready and difficulty, language, game mode are all chosen
             if (clientInfo.ready === clientInfo.total && clientInfo.difficulty === clientInfo.total && clientInfo.language === clientInfo.total && clientInfo.gameMode === clientInfo.total) {
-                console.log("Game selection")
+                // console.log("Game selection")
 
                 const clientStates = this.rooms[room_id].state.client_state;
                 const options = {
@@ -110,16 +110,46 @@ class SocketRooms {
                         }
                     }
 
-                    generateFillInTheBlank(finalState.language, finalState.difficulty, 10)
+                    generateFillInTheBlank(finalState.language, finalState.difficulty, 5)
                     .then((questions) => {
                         this.rooms[room_id].state.questions = questions
                     })
                     .catch((err) => {})
                 }
 
+                const allClientsAnswered = () => {
+                    for (const ws in clients) {
+                        if (this.rooms[room_id].state.client_state[ws].questionsAnswered !== this.rooms[room_id].state.questions.length) {
+                            return false
+                        }
+                    }
+                    return true
+                }
+                if (this.rooms[room_id].state.questions.length > 0 && allClientsAnswered()) {
+                    // for all clients if questionsAnswered is equal to questions.length, set in_progress to false and send message to all clients
+                    const client_ids = Object.keys(this.rooms[room_id].state.client_state)
+                    for (const id of client_ids) {
+                        
+                        this.rooms[room_id].state.in_progress = false
+                        const ws = this.rooms[room_id].clients[id]
+                        if (ws.readyState === ws.OPEN) {
+                            this.rooms[room_id].clients[id].send(JSON.stringify({
+                                type: 'gameOver',
+                                payload: {
+                                    client_state: this.rooms[room_id].state.client_state,
+                                }
+                            }))
+                        } else {
+                            console.log("Client not open")
+                        }
+                    }
+                    clearInterval(this.rooms[room_id].loop)
+
+                }
+
             }
 
-            console.log("Client Info", clientInfo)
+            // console.log("Client Info", clientInfo)
 
         }, 500)
         return loop
@@ -152,6 +182,7 @@ class SocketRooms {
                 }
             }
         }
+
         return clientResponses
     }
     
@@ -169,6 +200,7 @@ class SocketRooms {
         this.rooms[room_id].state.client_state[ws.id] = {
             ready: false,
             score: 0,
+            questionsAnswered: 0,
             choices: {
                 gameMode: 'default',
                 difficulty: 'default',
