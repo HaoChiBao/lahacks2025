@@ -61,8 +61,6 @@ export default function FillTheBlankGame({
     return pruned;
   };
   
-  
-
   const handleOptionSelect = (option: string, optionIndex: number) => {
     if (isSubmitted) return;
   
@@ -73,11 +71,7 @@ export default function FillTheBlankGame({
       setSelectedAnswers((prev) => {
         const newAnswers = { ...prev };
         const placeholderToRemove = Object.entries(prev).find(
-          ([placeholder, selectedOption]) => 
-          {
-            console.log(placeholder)
-              selectedOption === option // Match option text (specific) to remove it
-          }
+          ([_, selectedOption]) => selectedOption === option
         );
         if (placeholderToRemove) {
           const [placeholderKey] = placeholderToRemove;
