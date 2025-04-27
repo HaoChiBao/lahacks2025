@@ -26,64 +26,66 @@ const MultiplayerGameOver: React.FC = () => {
 
     return (
         <div
-            className={`min-h-screen min-w-full flex flex-col items-center justify-center ${
+            className={`min-h-screen flex items-center justify-center ${
                 isCurrentUserWinner ? 'bg-green-500' : 'bg-red-500'
             }`}
         >
-            <Card className="p-8 space-y-6 text-center shadow-md rounded-2xl bg-white">
-                <h1 className="text-2xl font-semibold text-gray-900">
-                    Game Over
-                </h1>
-                {isCurrentUserWinner ? (
-                    <h2 className="text-lg font-medium text-gray-700">
-                        🎉 Congratulations! You won!
-                    </h2>
-                ) : (
-                    <h2 className="text-lg font-medium text-gray-700">
-                        wow, guest-{winnerId} won this time.
-                    </h2>
-                )}
-            </Card>
+            <div className="w-full max-w-3xl p-6 space-y-6 bg-white rounded-2xl shadow-lg mx-4">
+                <Card className="p-6 text-center shadow-md rounded-2xl">
+                    <h1 className="text-2xl font-semibold text-gray-900">
+                        Game Over
+                    </h1>
+                    {isCurrentUserWinner ? (
+                        <h2 className="text-lg font-medium text-gray-700">
+                            🎉 Congratulations! You won!
+                        </h2>
+                    ) : (
+                        <h2 className="text-lg font-medium text-gray-700">
+                            wow, guest-{winnerId} won this time.
+                        </h2>
+                    )}
+                </Card>
 
-            <Card className="p-8 space-y-6 shadow-md rounded-2xl bg-white">
-                <h3 className="text-lg font-medium text-gray-900">
-                    Game Summary
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <Badge className="bg-gray-200 text-gray-800 rounded-full px-4 py-2">
-                        Winner ID: {winnerId}
-                    </Badge>
-                    <Badge className="bg-gray-200 text-gray-800 rounded-full px-4 py-2">
-                        Score: {winnerScore}
-                    </Badge>
-                    <Badge className="bg-gray-200 text-gray-800 rounded-full px-4 py-2">
-                        Questions Answered: {questionsAnswered} / {totalQuestions}
-                    </Badge>
-                    <Badge className="bg-gray-200 text-gray-800 rounded-full px-4 py-2">
-                        Game Mode: {gameMode}
-                    </Badge>
-                    <Badge className="bg-gray-200 text-gray-800 rounded-full px-4 py-2">
-                        Language: {language}
-                    </Badge>
-                    <Badge className="bg-gray-200 text-gray-800 rounded-full px-4 py-2">
-                        Difficulty: {difficulty}
-                    </Badge>
+                <Card className="p-6 shadow-md rounded-2xl">
+                    <h3 className="text-lg font-medium text-gray-900 text-center">
+                        Game Summary
+                    </h3>
+                    <div className="grid grid-cols-1 gap-4">
+                        <Badge className="bg-gray-200 text-gray-800 rounded-full px-4 py-2 text-center">
+                            Winner ID: {winnerId}
+                        </Badge>
+                        <Badge className="bg-gray-200 text-gray-800 rounded-full px-4 py-2 text-center">
+                            Score: {winnerScore}
+                        </Badge>
+                        <Badge className="bg-gray-200 text-gray-800 rounded-full px-4 py-2 text-center">
+                            Questions Answered: {questionsAnswered} / {totalQuestions}
+                        </Badge>
+                        <Badge className="bg-gray-200 text-gray-800 rounded-full px-4 py-2 text-center">
+                            Game Mode: {gameMode}
+                        </Badge>
+                        <Badge className="bg-gray-200 text-gray-800 rounded-full px-4 py-2 text-center">
+                            Language: {language}
+                        </Badge>
+                        <Badge className="bg-gray-200 text-gray-800 rounded-full px-4 py-2 text-center">
+                            Difficulty: {difficulty}
+                        </Badge>
+                    </div>
+                </Card>
+
+                <div className="space-y-4">
+                    <Button
+                        className="w-full bg-gray-900 text-white py-3 rounded-full shadow-md hover:shadow-lg transition-transform transform hover:scale-105"
+                        onClick={() => window.location.href = '/'}
+                    >
+                        Return to Home
+                    </Button>
+                    <Button
+                        className="w-full bg-gray-800 text-white py-3 rounded-full shadow-md hover:shadow-lg transition-transform transform hover:scale-105"
+                        onClick={handlePlayAgain}
+                    >
+                        Play Again
+                    </Button>
                 </div>
-            </Card>
-
-            <div className="space-y-4">
-                <Button
-                    className="w-full bg-gray-900 text-white py-3 rounded-full shadow-md hover:shadow-lg transition-transform transform hover:scale-105"
-                    onClick={() => window.location.href = '/'}
-                >
-                    Return to Home
-                </Button>
-                <Button
-                    className="w-full bg-gray-800 text-white py-3 rounded-full shadow-md hover:shadow-lg transition-transform transform hover:scale-105"
-                    onClick={handlePlayAgain}
-                >
-                    Play Again
-                </Button>
             </div>
         </div>
     );
