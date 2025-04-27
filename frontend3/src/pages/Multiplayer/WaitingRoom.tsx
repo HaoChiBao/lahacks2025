@@ -7,6 +7,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/ca
 import ClientProgressMeter from "@/components/ClientProgressMeter";
 
 import FillTheBlankGame from "../../components/FillTheBlankGame";
+// import { QRCodeCanvas } from "qrcode.react"; // ✅ ADD THIS import
+import { RoomQRCode } from "../../components/RoomQRCode";
+
 
 // Removed unused imports
 // Removed unused imports
@@ -36,7 +39,8 @@ export default function WaitingRoom() {
   };
 
   const [players, setPlayers] = useState<string[]>([]);
-  const [currentUserId, setCurrentUserId] = useState(null);
+  // const [currentUserId, setCurrentUserId] = useState(null);
+  let currentUserId = '';
   const [currentUserState, setCurrentUserState] = useState({
     ready: false,
     choices: {
@@ -151,7 +155,8 @@ export default function WaitingRoom() {
 
           break;
         case "connected":
-          setCurrentUserId(message.payload.id);
+          // setCurrentUserId(message.payload.id);
+          currentUserId = message.payload.id;
           break;
         case "gameOver":
           console.log("gameOver", message.payload);
@@ -162,7 +167,6 @@ export default function WaitingRoom() {
               return message.payload.client_state[curr].score > message.payload.client_state[prev].score ? curr : prev;
             });
             const winnerId = winner;
-            const winnerName = message.payload.client_state[winner].name;
             const winnerScore = message.payload.client_state[winner].score;
             const winnerQuestionsAnswered = message.payload.client_state[winner].questionsAnswered;
             const totalQuestions = message.payload.client_state[winner].questionsAnswered;
@@ -170,7 +174,7 @@ export default function WaitingRoom() {
             const language = message.payload.client_state[winner].choices.language;
             const difficulty = message.payload.client_state[winner].choices.difficulty;
   
-            navigate(`/multiplayer/gameover?winnerId=${winnerId}&winnerName=${winnerName}&winnerScore=${winnerScore}&questionsAnswered=${winnerQuestionsAnswered}&totalQuestions=${totalQuestions}&gameMode=${gameMode}&language=${language}&difficulty=${difficulty}&currentUserId=${currentUserId}&room_id=${room_id}`);
+            navigate(`/multiplayer/gameover?winnerId=${winnerId}&winnerScore=${winnerScore}&questionsAnswered=${winnerQuestionsAnswered}&totalQuestions=${totalQuestions}&gameMode=${gameMode}&language=${language}&difficulty=${difficulty}&currentUserId=${currentUserId}&room_id=${room_id}`);
           
           }, 1000);
 
@@ -277,17 +281,16 @@ export default function WaitingRoom() {
               <ArrowLeft className="h-5 w-5 text-gray-600" />
             </Button>
           </Link>
-          <div className="flex items-center gap-2">
-            <h1 className="text-lg font-semibold text-gray-700">Room: {code}</h1>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={copyCode}
-              className="h-7 w-7 p-0 bg-gray-200 text-gray-600"
-            >
-              <Copy className="h-4 w-4" />
-            </Button>
+          <div className="flex items-center gap-6">
+            <div className="flex items-center gap-3">
+              <div className="flex flex-col">
+                <h1 className="text-sm font-semibold text-gray-700">Room Code</h1>
+                <p className="text-lg font-bold text-blue-600">{code}</p>
+              </div>
+              <RoomQRCode code={code || ""} />
+            </div>
           </div>
+
         </div>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-1">

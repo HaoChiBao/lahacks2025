@@ -2,260 +2,270 @@ import { useState, useEffect, useRef } from "react";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { Card } from "./ui/card";
-import AnimalFloat from "./HerringFloat.tsx";
+import AnimalFloat from "./HerringFloat";
+import { useNavigate } from "react-router-dom";
+
 const animalModel = "/animals/Sparrow_LOD_All.glb";
 
-// export default function FillTheBlankGame({setGameScore}) {
 interface Question {
-    code: string;
-    options: string[];
-    description: string;
+  code: string;
+  options: string[];
+  description: string;
 }
 
 interface FillTheBlankGameProps {
-    questions: Question[];
-    // setScore is a useState setter function to update the score in the parent component
-    score: number;
-    setCompleted: React.Dispatch<React.SetStateAction<boolean>>;
-    setScore: React.Dispatch<React.SetStateAction<number>>;
-    setQuestionsAnswered: React.Dispatch<React.SetStateAction<number>>;
+  questions: Question[];
+  score: number;
+  setCompleted: React.Dispatch<React.SetStateAction<boolean>>;
+  setScore: React.Dispatch<React.SetStateAction<number>>;
+  setQuestionsAnswered: React.Dispatch<React.SetStateAction<number>>;
 }
 
-export default function FillTheBlankGame({ questions, score, setScore, setCompleted, setQuestionsAnswered }: FillTheBlankGameProps) {
-    const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-    const [selectedAnswers, setSelectedAnswers] = useState<Record<string, string>>({});
-    const [isSubmitted, setIsSubmitted] = useState(false);
-    const [shuffledOptions, setShuffledOptions] = useState<string[]>([]);
-    const nextQuestionRef = useRef<HTMLButtonElement>(null);
+export default function FillTheBlankGame({
+  questions,
+  score,
+  setScore,
+  setCompleted,
+  setQuestionsAnswered,
+}: FillTheBlankGameProps) {
+  const navigate = useNavigate();
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [selectedAnswers, setSelectedAnswers] = useState<Record<string, string>>({});
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [shuffledOptions, setShuffledOptions] = useState<string[]>([]);
+  const nextQuestionRef = useRef<HTMLButtonElement>(null);
 
-    const currentQuestion = questions[currentQuestionIndex];
+  const currentQuestion = questions[currentQuestionIndex];
 
-    useEffect(() => {
-        const shuffled = [...currentQuestion.options].sort(() => Math.random() - 0.5);
-        setShuffledOptions(shuffled);
-        setSelectedAnswers({});
-        setIsSubmitted(false);
-    }, [currentQuestionIndex]);
+  useEffect(() => {
+    if (currentQuestion) {
+      const shuffled = [...currentQuestion.options].sort(() => Math.random() - 0.5);
+      setShuffledOptions(shuffled);
+      setSelectedAnswers({});
+      setIsSubmitted(false);
+    }
+  }, [currentQuestionIndex]);
 
-    const handleOptionSelect = (placeholder: string, option: string) => {
-        if (isSubmitted) return;
+  const handleOptionSelect = (option: string) => {
+    if (isSubmitted) return;
+  
+    const availablePlaceholders = currentQuestion.code.match(/<option: \d+>/g) || [];
+    const filledPlaceholders = Object.keys(selectedAnswers);
+    const nextPlaceholder = availablePlaceholders
+      .map(ph => ph.match(/\d+/)?.[0])
+      .find(number => !filledPlaceholders.includes(number!));
+  
+    if (!nextPlaceholder) return;
+  
+    setSelectedAnswers((prev) => {
+      const existingPlaceholder = Object.keys(prev).find((key) => prev[key] === option);
+  
+      if (existingPlaceholder) {
+        // If this option was already selected somewhere, unselect it
+        const { [existingPlaceholder]: _, ...rest } = prev;
+        return rest;
+      } else {
+        // Otherwise, add it to the next available placeholder
+        return { ...prev, [nextPlaceholder]: option };
+      }
+    });
+  };
+  
 
-        setSelectedAnswers((prev: Record<string, string>) => {
-            const existingPlaceholder = Object.keys(prev).find(
-                (key) => prev[key] === option
-            );
+  const handleSubmit = () => {
+    setIsSubmitted(true);
 
-            if (existingPlaceholder) {
-                const { [existingPlaceholder]: _, ...rest } = prev;
-                return rest;
-            } else {
-                return { ...prev, [placeholder]: option };
-            }
-        });
-    };
+    const correct = Object.keys(selectedAnswers).filter(
+      (key) => selectedAnswers[key] === currentQuestion.options[Number(key) - 1]
+    ).length;
 
-    const handleSubmit = () => {
-        setIsSubmitted(true);
+    setScore((prevScore) => prevScore + correct * 10);
+    setQuestionsAnswered((prev) => prev + 1);
 
-        const correct = Object.keys(selectedAnswers).filter(
-            (key) => selectedAnswers[key] === currentQuestion.options[Number(key) - 1]
-        ).length;
+    setTimeout(() => {
+      nextQuestionRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, 300);
+  };
 
-        setScore((prevScore) => prevScore + correct * 10);
+  const handleNextQuestion = () => {
+    if (currentQuestionIndex < questions.length - 1) {
+      setCurrentQuestionIndex((prev) => prev + 1);
+    } else {
+      setCompleted(true);
+      navigate("/gameover");
+    }
+  };
 
-        setQuestionsAnswered((prev) => prev + 1);
+  const renderCodeWithBlanks = () => {
+    return currentQuestion.code.split("\n").map((line, index) => {
+      const placeholders = line.match(/<option: \d+>/g) || [];
+      let processedLine = line;
 
-        setTimeout(() => {
-            nextQuestionRef.current?.scrollIntoView({ behavior: "smooth" });
-        }, 300);
-    };
+      placeholders.forEach((placeholder) => {
+        const placeholderNumber = placeholder.match(/\d+/)?.[0] || "";
+        const selectedOption = selectedAnswers[placeholderNumber] || "";
+        const correctOption = currentQuestion.options[Number(placeholderNumber) - 1];
 
-    const handleNextQuestion = () => {
-        if (currentQuestionIndex < questions.length - 1) {
-            setCurrentQuestionIndex((prev) => prev + 1);
+        let className = "text-blue-500 border rounded px-1";
+        if (isSubmitted) {
+          if (selectedOption === correctOption) {
+            className = "bg-green-200 text-green-800 border-green-500 rounded px-1";
+          } else {
+            className = "bg-red-200 text-red-800 border-red-500 rounded px-1";
+          }
         }
-    };
 
-    const renderCodeWithBlanks = () => {
-        return currentQuestion.code.split("\n").map((line, index) => {
-            const placeholders = line.match(/<option: \d+>/g) || [];
-            let processedLine = line;
-
-            placeholders.forEach((placeholder) => {
-                const match = placeholder.match(/\d+/);
-                const placeholderNumber = match ? match[0] : "";
-                const selectedOption = selectedAnswers[placeholderNumber] || "";
-                const correctOption = currentQuestion.options[Number(placeholderNumber) - 1];
-
-                let className = "text-blue-500 border rounded px-1";
-                if (isSubmitted) {
-                    if (selectedOption === correctOption) {
-                        className = "bg-green-200 text-green-800 border-green-500 rounded px-1";
-                    } else {
-                        className = "bg-red-200 text-red-800 border-red-500 rounded px-1";
-                    }
-                }
-
-                processedLine = processedLine.replace(
-                    placeholder,
-                    `<span class="${className}">${selectedOption || "_____"}</span>`
-                );
-            });
-
-            return (
-                <div
-                    key={index}
-                    className="font-mono text-sm text-gray-800 whitespace-pre-wrap"
-                    dangerouslySetInnerHTML={{ __html: processedLine }}
-                />
-            );
-        });
-    };
-
-    const renderResults = () => {
-        if (!isSubmitted) return null;
-
-        const total = currentQuestion.options.length;
-        const correct = Object.keys(selectedAnswers).filter(
-            (key) =>
-                selectedAnswers[key] === currentQuestion.options[Number(key) - 1]
-        ).length;
-        const incorrect = total - correct;
-        const percentage = (correct / total) * 100;
-
-        return (
-            <div className="flex flex-col md:flex-row items-center justify-center gap-6 bg-white rounded-xl shadow-md p-6">
-                <div className="w-full md:w-1/3 flex justify-center">
-                    <AnimalFloat model={animalModel} />
-                </div>
-
-                <div className="w-full md:w-2/3 space-y-4 text-center md:text-left">
-                    <h3 className={`text-2xl font-bold ${percentage === 100 ? "text-green-800" : percentage >= 50 ? "text-yellow-800" : "text-red-800"}`}>
-                        🎉 Results
-                    </h3>
-                    <p className={`text-lg ${percentage === 100 ? "text-green-800" : percentage >= 50 ? "text-yellow-800" : "text-red-800"}`}>
-                        <span className="font-bold">Correct:</span> {correct} / {total} ({percentage.toFixed(1)}%)
-                    </p>
-                    <p className={`text-lg ${percentage === 100 ? "text-green-800" : percentage >= 50 ? "text-yellow-800" : "text-red-800"}`}>
-                        <span className="font-bold">Incorrect:</span> {incorrect}
-                    </p>
-                    
-                    <p className="text-gray-600">{currentQuestion.description}</p>
-
-                    <div className="rounded-xl bg-gray-100 p-4 text-gray-800 overflow-auto">
-                        {currentQuestion.code.split("\n").map((line, index) => {
-                            const placeholders = line.match(/<option: \d+>/g) || [];
-                            let processedLine = line;
-
-                            placeholders.forEach((placeholder) => {
-                                const match = placeholder.match(/\d+/);
-                                const placeholderNumber = match ? match[0] : "";
-                                const correctOption = currentQuestion.options[Number(placeholderNumber) - 1];
-
-                                processedLine = processedLine.replace(
-                                    placeholder,
-                                    `<span class="bg-green-200 text-green-800 border-green-500 rounded px-1">${correctOption}</span>`
-                                );
-                            });
-
-                            return (
-                                <div
-                                    key={index}
-                                    className="font-mono text-sm text-gray-800 whitespace-pre-wrap"
-                                    dangerouslySetInnerHTML={{ __html: processedLine }}
-                                />
-                            );
-                        })}
-                    </div>
-                </div>
-            </div>
+        processedLine = processedLine.replace(
+          placeholder,
+          `<span class="${className}">${selectedOption || "_____"}</span>`
         );
-    };
+      });
+
+      return (
+        <div
+          key={index}
+          className="font-mono text-sm text-gray-800 whitespace-pre-wrap"
+          dangerouslySetInnerHTML={{ __html: processedLine }}
+        />
+      );
+    });
+  };
+
+  const renderResults = () => {
+    if (!isSubmitted) return null;
+
+    const total = currentQuestion.options.length;
+    const correct = Object.keys(selectedAnswers).filter(
+      (key) => selectedAnswers[key] === currentQuestion.options[Number(key) - 1]
+    ).length;
+    const incorrect = total - correct;
+    const percentage = (correct / total) * 100;
 
     return (
-        <div className="space-y-8 p-4 md:p-8">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                <h1 className="text-xl font-bold text-gray-700">Fill in the Blank Game</h1>
-                <Badge className="bg-gray-200 text-gray-700">Programming</Badge>
-                
-            </div>
-
-            <div className="flex justify-center items-center my-4">
-                <Badge className="bg-green-100 text-green-800 text-lg">
-                    Score: {score}
-                </Badge>
-            </div>
-
-            <Card className="p-6 space-y-4">
-                <h3 className="text-gray-700 font-semibold text-lg">Code Snippet</h3>
-                
-                <div className="rounded-xl bg-gray-100 p-4 text-gray-800 overflow-auto">
-                    {renderCodeWithBlanks()}
-                </div>
-
-
-                {/* New Question Progress Indicator */}
-                <div className="flex justify-center items-center my-4">
-                    <Badge className="bg-blue-100 text-blue-800">
-                    Question {currentQuestionIndex + 1} / {questions.length}
-                    </Badge>
-                </div>
-            </Card>
-
-            <Card className="p-6 space-y-4">
-                <h3 className="text-gray-700 font-semibold text-lg">Options</h3>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    {shuffledOptions.map((option, index) => (
-                        <Button
-                            key={index}
-                            className={`${
-                                Object.values(selectedAnswers).includes(option)
-                                    ? "bg-blue-500 text-white"
-                                    : "bg-gray-100 text-gray-700"
-                            }`}
-                            onClick={() =>
-                                handleOptionSelect(
-                                    String(Object.keys(selectedAnswers).length + 1),
-                                    option
-                                )
-                            }
-                            disabled={isSubmitted}
-                        >
-                            {option}
-                        </Button>
-                    ))}
-                </div>
-            </Card>
-
-            <Button
-                className="w-full bg-blue-500 text-white py-2"
-                onClick={handleSubmit}
-                disabled={isSubmitted}
-            >
-                {isSubmitted ? "Submitted" : "Submit"}
-            </Button>
-
-            {renderResults()}
-
-            {isSubmitted && (
-                <Button
-                    ref={nextQuestionRef}
-                    className={`w-full py-2 ${
-                        currentQuestionIndex < questions.length - 1
-                            ? "bg-green-500 text-white"
-                            : "bg-red-300 text-red-800"
-                    }`}
-                    onClick={
-                        currentQuestionIndex < questions.length - 1
-                            ? handleNextQuestion
-                            : () => setCompleted(true)
-                    }
-                >
-                    {currentQuestionIndex < questions.length - 1
-                        ? "Next Question"
-                        : "Exit Now"}
-                </Button>
-            )}
+      <div className="flex flex-col md:flex-row items-center justify-center gap-6 bg-white rounded-xl shadow-md p-6">
+        <div className="w-full md:w-1/3 flex justify-center">
+          <AnimalFloat model={animalModel} />
         </div>
+
+        <div className="w-full md:w-2/3 space-y-4 text-center md:text-left">
+          <h3
+            className={`text-2xl font-bold ${
+              percentage === 100
+                ? "text-green-800"
+                : percentage >= 50
+                ? "text-yellow-800"
+                : "text-red-800"
+            }`}
+          >
+            🎉 Results
+          </h3>
+          <p
+            className={`text-lg ${
+              percentage === 100
+                ? "text-green-800"
+                : percentage >= 50
+                ? "text-yellow-800"
+                : "text-red-800"
+            }`}
+          >
+            <span className="font-bold">Correct:</span> {correct} / {total} ({percentage.toFixed(1)}%)
+          </p>
+          <p
+            className={`text-lg ${
+              percentage === 100
+                ? "text-green-800"
+                : percentage >= 50
+                ? "text-yellow-800"
+                : "text-red-800"
+            }`}
+          >
+            <span className="font-bold">Incorrect:</span> {incorrect}
+          </p>
+          <p className="text-gray-600">{currentQuestion.description}</p>
+        </div>
+      </div>
     );
+  };
+
+  return (
+    <div className="space-y-8 p-4 md:p-8">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <h1 className="text-xl font-bold text-gray-700">Fill in the Blank Game</h1>
+        <Badge className="bg-gray-200 text-gray-700">Programming</Badge>
+      </div>
+
+      <div className="flex justify-center items-center my-4">
+        <Badge className="bg-green-100 text-green-800 text-lg">
+          Score: {score}
+        </Badge>
+      </div>
+
+      <Card className="p-6 space-y-4">
+        <h3 className="text-gray-700 font-semibold text-lg">Code Snippet</h3>
+
+        <div className="rounded-xl bg-gray-100 p-4 text-gray-800 overflow-auto">
+          {renderCodeWithBlanks()}
+        </div>
+
+        <div className="flex justify-center items-center my-4">
+          <Badge className="bg-blue-100 text-blue-800">
+            Question {currentQuestionIndex + 1} / {questions.length}
+          </Badge>
+        </div>
+      </Card>
+
+      <Card className="p-6 space-y-4">
+        <h3 className="text-gray-700 font-semibold text-lg">Options</h3>
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          {shuffledOptions.map((option, index) => (
+            <Button
+              key={index}
+              className={`${
+                Object.values(selectedAnswers).includes(option)
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-100 text-gray-700"
+              }`}
+              onClick={() =>
+                handleOptionSelect(
+                //   String(Object.keys(selectedAnswers).length + 1),
+                  option
+                )
+              }
+              disabled={isSubmitted}
+            >
+              {option}
+            </Button>
+          ))}
+        </div>
+      </Card>
+
+      <Button
+        className="w-full bg-blue-500 text-white py-2"
+        onClick={handleSubmit}
+        disabled={isSubmitted}
+      >
+        {isSubmitted ? "Submitted" : "Submit"}
+      </Button>
+
+      {renderResults()}
+
+      {isSubmitted && (
+        <Button
+          ref={nextQuestionRef}
+          className={`w-full py-2 ${
+            currentQuestionIndex < questions.length - 1
+              ? "bg-green-500 text-white"
+              : "bg-red-300 text-red-800"
+          }`}
+          onClick={
+            currentQuestionIndex < questions.length - 1
+              ? handleNextQuestion
+              : () => setCompleted(true)
+          }
+        >
+          {currentQuestionIndex < questions.length - 1 ? "Next Question" : "Exit Now"}
+        </Button>
+      )}
+    </div>
+  );
 }

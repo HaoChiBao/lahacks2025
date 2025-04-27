@@ -77,6 +77,7 @@ class SocketRooms {
                     options.gameMode[choices.gameMode] = (options.gameMode[choices.gameMode] || 0) + 1;
                 }
 
+                console.log(clientInfo)
                 if (clientInfo.difficulty === clientInfo.total && clientInfo.language === clientInfo.total && clientInfo.gameMode === clientInfo.total && this.rooms[room_id].mode === 'default') {
 
                     
