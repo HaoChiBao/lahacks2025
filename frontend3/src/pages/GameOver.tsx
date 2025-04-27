@@ -10,6 +10,7 @@ export default function GameOverPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const [showConfetti, setShowConfetti] = useState(true);
+  setShowConfetti(true)
 
   // Parse URL parameters
   const searchParams = new URLSearchParams(location.search);

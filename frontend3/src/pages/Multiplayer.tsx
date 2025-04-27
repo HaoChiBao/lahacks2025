@@ -17,11 +17,6 @@ export default function MultiplayerPage() {
 
   const navigate = useNavigate();
 
-  function handleJoin() {
-    if (!roomCode) return;
-    navigate(`/multiplayer/room/${roomCode}`);
-  }
-
   function handleCreate() {
     const code = generateRoomCode();
     setTempCode(code);

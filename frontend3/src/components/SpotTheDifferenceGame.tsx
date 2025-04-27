@@ -11,17 +11,25 @@ import { useNavigate } from "react-router-dom";
 
 const animalModel = "/animals/Sparrow_LOD_All.glb";
 
-export default function SpotTheDifferenceGame({ mode = "single", playerName = "Player", players = [], onGameEnd }) {
+interface SpotTheDifferenceGameProps {
+  mode?: "single" | "multi";
+  playerName?: string;
+  players?: string[];
+  onGameEnd?: (result: { score: number; correct: number; total: number; level: string }) => void;
+}
+
+// export default function SpotTheDifferenceGame({ mode = "single", playerName = "Player", players = [], onGameEnd }: SpotTheDifferenceGameProps) {
+export default function SpotTheDifferenceGame({ onGameEnd }: SpotTheDifferenceGameProps) {
   const [currentLevel, setCurrentLevel] = useState("beginner");
   const [currentSnippet, setCurrentSnippet] = useState(0);
   const [score, setScore] = useState(0);
   const [lives, setLives] = useState(3);
   const [timeLeft, setTimeLeft] = useState(60);
   const [gameActive, setGameActive] = useState(true);
-  const [foundDifferences, setFoundDifferences] = useState([]);
+  const [foundDifferences, setFoundDifferences] = useState<number[]>([]);
   const [showExplanation, setShowExplanation] = useState(false);
 
-  const nextPuzzleButtonRef = useRef(null); // Ref for the "Next Puzzle" button
+  const nextPuzzleButtonRef = useRef<HTMLButtonElement | null>(null); // Ref for the "Next Puzzle" button
 
   const currentPuzzle = codeSnippets[currentLevel][currentSnippet];
   const totalDifferences = currentPuzzle.differences.length;
@@ -59,7 +67,7 @@ export default function SpotTheDifferenceGame({ mode = "single", playerName = "P
     }
   };
 
-  const handleLineClick = (lineNumber) => {
+  const handleLineClick = (lineNumber: number) => {
     if (!gameActive || showExplanation) return;
     if (currentPuzzle.differences.includes(lineNumber)) {
       if (!foundDifferences.includes(lineNumber)) {
