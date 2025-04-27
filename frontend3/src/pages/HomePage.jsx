@@ -24,16 +24,16 @@ export default function HomePage() {
       <main className="flex-1 relative overflow-hidden">
   {/* Floating Herring */}
   <div className="flex justify-center mt-12 mb-[-40px]">
-    <HerringFloat />
+    <AnimalBounce />
   </div>
-  
+
   <section className="relative w-full py-12 md:py-24 lg:py-32">
     <div className="px-4 md:px-6">
       <div className="flex flex-col items-center justify-center space-y-8 text-center">
         {/* Title */}
         <div className="space-y-2">
           <h2 className="text-4xl font-bold tracking-tight sm:text-5xl text-gray-800">
-            Spot the Code Differences
+            BrainBug
           </h2>
           <p className="max-w-[700px] text-gray-500 md:text-xl">
             Train your debugging skills by spotting differences between incorrect and correct code snippets.
@@ -114,7 +114,6 @@ export default function HomePage() {
           </div>
         </section>
       </main>
-      <Test/> //calls animal here lol
 
       {/* Footer */}
       <footer className="border-t border-gray-200 py-6 md:py-0">

@@ -1,13 +1,12 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, Clock, Code2, Heart } from "lucide-react";
-
 import { Button } from "../../components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "../../components/ui/tabs";
 import { Badge } from "../../components/ui/badge";
 import { Progress } from "../../components/ui/progress";
 import { CodeBlock } from "../../components/ui/CodeBlock";
-import { AnimalFloat } from "../../components/HerringFloat"; // <- assuming you built it
+import { AnimalFloat } from "../../components/HerringFloat";
 import { codeSnippets } from "../../lib/code-snippets";
 
 const animalModels = [
@@ -17,6 +16,7 @@ const animalModels = [
 ];
 
 export default function SpotTheDifference() {
+  const [difficultySelected, setDifficultySelected] = useState(false);  // NEW
   const [currentLevel, setCurrentLevel] = useState("beginner");
   const [currentSnippet, setCurrentSnippet] = useState(0);
   const [score, setScore] = useState(0);
@@ -29,7 +29,7 @@ export default function SpotTheDifference() {
 
   const navigate = useNavigate();
   const currentPuzzle = codeSnippets[currentLevel][currentSnippet];
-  const totalDifferences = currentPuzzle.differences.length;
+  const totalDifferences = currentPuzzle?.differences.length || 0;
   const animalModel = "/animals/Pudu_LOD_All.glb";
 
   useEffect(() => {
@@ -90,14 +90,6 @@ export default function SpotTheDifference() {
     }
   };
 
-  const handleLevelChange = (level) => {
-    setCurrentLevel(level);
-    setCurrentSnippet(0);
-    setFoundDifferences([]);
-    setShowExplanation(false);
-    setTimeLeft(60);
-  };
-
   const handleRestartGame = () => {
     setScore(0);
     setLives(3);
@@ -108,9 +100,53 @@ export default function SpotTheDifference() {
     setGameActive(true);
   };
 
+  // --- 🎯 BEFORE GAME START: Choose difficulty first ---
+  if (!difficultySelected) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center bg-[#f9fafb] text-center space-y-8 p-6">
+        <h1 className="text-4xl font-bold text-gray-700">Choose Your Difficulty</h1>
+        <div className="flex flex-col gap-4">
+          <Button
+            className="bg-gray-200 hover:bg-blue-300 text-gray-800 hover:text-white px-10 py-4 rounded-lg text-lg"
+            onClick={() => {
+              setCurrentLevel("beginner");
+              setDifficultySelected(true);
+            }}
+          >
+            Beginner
+          </Button>
+          <Button
+            className="bg-gray-200 hover:bg-purple-300 text-gray-800 hover:text-white px-10 py-4 rounded-lg text-lg"
+            onClick={() => {
+              setCurrentLevel("intermediate");
+              setDifficultySelected(true);
+            }}
+          >
+            Intermediate
+          </Button>
+          <Button
+            className="bg-gray-200 hover:bg-pink-300 text-gray-800 hover:text-white px-10 py-4 rounded-lg text-lg"
+            onClick={() => {
+              setCurrentLevel("advanced");
+              setDifficultySelected(true);
+            }}
+          >
+            Advanced
+          </Button>
+        </div>
+        <Link to="/">
+          <Button variant="outline" className="mt-6 text-gray-600 hover:bg-gray-200">
+            Back to Home
+          </Button>
+        </Link>
+      </div>
+    );
+  }
+
+  // --- 🎮 MAIN GAME ---
   return (
     <div className="flex min-h-screen flex-col bg-[#f9fafb]">
-      {/* Header */}
+      {/* --- HEADER --- */}
       <header className="border-b bg-white shadow-sm">
         <div className="container flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
           <div className="flex items-center">
@@ -139,33 +175,16 @@ export default function SpotTheDifference() {
         </div>
       </header>
 
-      {/* Main */}
+      {/* --- MAIN GAMEPLAY --- */}
       <main className="flex-1 container py-8">
         {gameActive ? (
           <div className="space-y-8">
-            {/* Top Controls */}
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-              <Tabs value={currentLevel} onValueChange={handleLevelChange}>
-                <TabsList className="rounded-lg bg-gray-100">
-                  <TabsTrigger value="beginner">Beginner</TabsTrigger>
-                  <TabsTrigger value="intermediate">Intermediate</TabsTrigger>
-                  <TabsTrigger value="advanced">Advanced</TabsTrigger>
-                </TabsList>
-              </Tabs>
-
-              <div className="flex items-center space-x-3">
-                <Badge className="bg-gray-200 text-gray-700">{currentPuzzle.language}</Badge>
-                <Badge className="bg-blue-100 text-blue-700">
-                  {foundDifferences.length} / {totalDifferences} found
-                </Badge>
-              </div>
-            </div>
-
             {/* Progress */}
             <Progress value={(foundDifferences.length / totalDifferences) * 100} className="h-2 bg-gray-200 rounded-full" />
 
-            {/* Code Blocks */}
+            {/* Code Sections */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {/* Incorrect Code */}
               <div className="rounded-2xl bg-white shadow-md p-6">
                 <h3 className="text-gray-700 font-semibold mb-4">Incorrect Code</h3>
                 <div className="rounded-xl bg-[#0f172a] p-4">
@@ -178,6 +197,7 @@ export default function SpotTheDifference() {
                 </div>
               </div>
 
+              {/* Correct Code */}
               <div className="rounded-2xl bg-white shadow-md p-6">
                 <h3 className="text-gray-700 font-semibold mb-4">Correct Code</h3>
                 <div className="rounded-xl bg-[#0f172a] p-4">
@@ -191,17 +211,12 @@ export default function SpotTheDifference() {
               </div>
             </div>
 
-            {/* Explanation Section */}
+            {/* Explanation + Next */}
             {showExplanation && (
               <div className="flex flex-col md:flex-row items-center justify-center gap-8 bg-white rounded-2xl shadow-md p-8 mt-8">
-                {/* 3D Animal */}
                 <div className="w-full md:w-1/3 flex justify-center">
-                  <div style={{ width: "200px", height: "200px" }}>
-                    <AnimalFloat model={randomAnimalModel} />
-                  </div>
+                  <AnimalFloat model={animalModel} />
                 </div>
-
-                {/* Speech Bubble */}
                 <div className="w-full md:w-2/3 space-y-4 text-center md:text-left">
                   <h3 className="text-3xl font-bold text-gray-800">
                     {wasAnswerCorrect ? "🎉 Good Job!" : "😅 Oops!"}
@@ -209,7 +224,7 @@ export default function SpotTheDifference() {
                   <p className="text-gray-600">{currentPuzzle.explanation}</p>
 
                   <Button className="mt-4 bg-blue-500 hover:bg-blue-600 text-white" onClick={handleNextPuzzle}>
-                    {wasAnswerCorrect ? "Next Challenge →" : "Try Again →"}
+                    {wasAnswerCorrect ? "Next Challenge →" : "Next Puzzle →"}
                   </Button>
                 </div>
               </div>
