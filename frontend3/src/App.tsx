@@ -1,13 +1,13 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import HomePage from "./pages/HomePage.jsx";
+import HomePage from "./pages/HomePage.js";
 import Game from "./pages/GameModes/Game.jsx"; // 💬 this is your new Game mode selector
-import MultiplayerPage from "./pages/Multiplayer.jsx";
-import LeaderboardPage from "./pages/Leaderboard.jsx";
+import MultiplayerPage from "./pages/Multiplayer.js";
+import LeaderboardPage from "./pages/Leaderboard.js";
 import HowToPlayPage from "./pages/HowToPlay.jsx";
-import GameOverPage from "./pages/GameOver.jsx";
+import GameOverPage from "./pages/GameOver.js";
 import WaitingRoomPage from "./pages/Multiplayer/WaitingRoom.jsx"
 import RoomSpotDifference from "./pages/Multiplayer/RoomSpotDifference.jsx"; // ⭐ added Room game page separately
-import GlobalLeaderboard from "./pages/GlobalLeaderboard.jsx";
+import GlobalLeaderboard from "./pages/GlobalLeaderboard.js";
 
 
 function App() {

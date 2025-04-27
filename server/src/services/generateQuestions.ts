@@ -10,7 +10,7 @@ interface GeneratedQuestion {
   description: string;
 }
 
-const generateQuestionPrompt = async (
+const generateFillInTheBlank = async (
   language: string,
   difficulty: "Beginner" | "Intermediate" | "Advanced",
   amount: number
@@ -94,4 +94,4 @@ ${difficulty === "Beginner" ? `
   }
 };
 
-export { generateQuestionPrompt, GeneratedQuestion };
+export { generateFillInTheBlank, GeneratedQuestion };

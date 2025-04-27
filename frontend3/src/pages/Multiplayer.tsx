@@ -8,40 +8,36 @@ import { Input } from "../components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
 import { generateRoomCode } from "../lib/utils";
 
-
 export default function MultiplayerPage() {
   const [tab, setTab] = useState("join");
-  const [playerName, setPlayerName] = useState("");
   const [roomCode, setRoomCode] = useState("");
   const [createdCode, setCreatedCode] = useState("");
   const [gameModeSelect, setGameModeSelect] = useState(false);
   const [tempCode, setTempCode] = useState("");
-  const [selectedMode, setSelectedMode] = useState("");
 
   const navigate = useNavigate();
 
   function handleJoin() {
-    if (!playerName || !roomCode) return;
-    navigate(`/multiplayer/room/${roomCode}?name=${encodeURIComponent(playerName)}`);
+    if (!roomCode) return;
+    navigate(`/multiplayer/room/${roomCode}`);
   }
 
   function handleCreate() {
-    if (!playerName) return;
     const code = generateRoomCode();
     setTempCode(code);
     setGameModeSelect(true);
   }
 
   function handleModeSelect() {
-    if (!tempCode || !playerName) return;
+    if (!tempCode) return;
     setCreatedCode(tempCode); // finalize the code
     setGameModeSelect(false); // return to the "waiting for players" room screen
-    navigate(`/multiplayer/room/${tempCode}?name=${encodeURIComponent(playerName)}`);
+    navigate(`/multiplayer/room/${tempCode}`);
   }
 
-  function joinRoom(mode) {
-    if (!roomCode || !playerName) return;
-    navigate(`/multiplayer/room/${roomCode}?name=${encodeURIComponent(playerName)}&mode=${mode}`);
+  function joinRoom(mode:any) {
+    if (!roomCode) return;
+    navigate(`/multiplayer/room/${roomCode}?mode=${mode}`);
   }
 
   function copyCode() {
@@ -68,7 +64,7 @@ export default function MultiplayerPage() {
         <div className="max-w-md mx-auto">
           {!gameModeSelect ? (
             <Tabs defaultValue="join" value={tab} onValueChange={setTab}>
-              <TabsList className="grid w-full grid-cols-2 mb-6 bg-[#f1f5f9] rounded-xl p-1 shadow-inner">
+              <TabsList className="grid w-full grid-cols-2 mb-4 bg-[#f1f5f9] rounded-xl p-1 shadow-inner">
                 <TabsTrigger value="join" className="rounded-xl data-[state=active]:bg-white data-[state=active]:text-black transition-all">
                   Join
                 </TabsTrigger>
@@ -78,22 +74,12 @@ export default function MultiplayerPage() {
               </TabsList>
 
               <TabsContent value="join">
-              <Card className="bg-white shadow-md rounded-2xl p-6 border-0">
+                <Card className="bg-white shadow-md rounded-2xl p-4 border-0">
                   <CardHeader>
                     <CardTitle>Join a Game</CardTitle>
                     <CardDescription className="text-gray-500">Enter a room code to join</CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="space-y-1">
-                      <label htmlFor="name" className="text-sm font-medium">Your Name</label>
-                      <Input
-                        id="name"
-                        placeholder="Enter your name"
-                        value={playerName}
-                        onChange={(e) => setPlayerName(e.target.value)}
-                        className="rounded-xl bg-gray-100 border-0 focus:ring-2 focus:ring-blue-400"
-                      />
-                    </div>
+                  <CardContent className="space-y-2">
                     <div className="space-y-1">
                       <label htmlFor="room" className="text-sm font-medium">Room Code</label>
                       <Input
@@ -117,25 +103,14 @@ export default function MultiplayerPage() {
               </TabsContent>
 
               <TabsContent value="create">
-              <Card className="bg-white shadow-md rounded-2xl p-6 border-0">
+                <Card className="bg-white shadow-md rounded-2xl p-4 border-0">
                   <CardHeader>
                     <CardTitle>Create a Game</CardTitle>
                     <CardDescription className="text-gray-500">Generate a new room code</CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="space-y-1">
-                      <label htmlFor="name-create" className="text-sm font-medium">Your Name</label>
-                      <Input
-                        id="name-create"
-                        placeholder="Enter your name"
-                        value={playerName}
-                        onChange={(e) => setPlayerName(e.target.value)}
-                        className="rounded-xl bg-gray-100 border-0 focus:ring-2 focus:ring-blue-400"
-                      />
-                    </div>
-
+                  <CardContent className="space-y-2">
                     {createdCode && (
-                      <div className="space-y-2">
+                      <div className="space-y-1">
                         <label className="text-sm font-medium">Room Code</label>
                         <div className="flex items-center gap-2">
                           <div className="bg-gray-100 p-2 rounded-xl font-mono text-center flex-1 text-lg">
@@ -172,7 +147,9 @@ export default function MultiplayerPage() {
               </TabsContent>
             </Tabs>
           ) : (
-            handleModeSelect()
+            <>
+              {handleModeSelect()}
+            </>
           )}
         </div>
       </main>

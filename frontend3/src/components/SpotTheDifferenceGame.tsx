@@ -1,11 +1,11 @@
 import { useState, useEffect, useRef } from "react";
-import { CodeBlock } from "../components/ui/CodeBlock";
-import { Button } from "../components/ui/button";
-import { Tabs, TabsList, TabsTrigger } from "../components/ui/tabs";
-import { Progress } from "../components/ui/progress";
-import { Badge } from "../components/ui/badge";
+import { CodeBlock } from "./ui/CodeBlock";
+import { Button } from "./ui/button";
+import { Tabs, TabsList, TabsTrigger } from "./ui/tabs";
+import { Progress } from "./ui/progress";
+import { Badge } from "./ui/badge";
 import { codeSnippets } from "../lib/code-snippets";
-import AnimalFloat from "../components/HerringFloat";
+import AnimalFloat from "./HerringFloat";
 import { useNavigate } from "react-router-dom";
 
 

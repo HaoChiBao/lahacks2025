@@ -28,7 +28,7 @@ export default function GameOverPage() {
         level,
         date: new Date().toISOString(),
       });
-      leaderboardData.sort((a, b) => b.score - a.score);
+      leaderboardData.sort((a: { score: number }, b: { score: number }) => b.score - a.score);
       localStorage.setItem("codeSpotterLeaderboard", JSON.stringify(leaderboardData.slice(0, 10)));
     }
   }, [score, level]);
@@ -39,7 +39,7 @@ export default function GameOverPage() {
       const animationEnd = Date.now() + duration;
       const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
 
-      function randomInRange(min, max) {
+      function randomInRange(min: number, max: number) {
         return Math.random() * (max - min) + min;
       }
 

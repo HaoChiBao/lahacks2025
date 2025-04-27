@@ -5,11 +5,17 @@ import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card"
 import { Trophy } from "lucide-react";
 
 export default function GlobalLeaderboard() {
-  const [leaderboard, setLeaderboard] = useState([]);
+  interface Player {
+    name: string;
+    score: number;
+    level: string;
+  }
+
+  const [leaderboard, setLeaderboard] = useState<Player[]>([]);
 
   useEffect(() => {
     // Fetch from localStorage or dummy fallback
-    const data = JSON.parse(localStorage.getItem("codeSpotterLeaderboard")) || [
+    const data = JSON.parse(localStorage.getItem("codeSpotterLeaderboard") || "[]") || [
       { name: "Alex", score: 550, level: "advanced" },
       { name: "Jamie", score: 430, level: "intermediate" },
       { name: "Taylor", score: 390, level: "beginner" },
