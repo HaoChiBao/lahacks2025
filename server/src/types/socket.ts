@@ -1,6 +1,6 @@
-type GameModes = 'difference' | 'fill' | 'default';
-type Difficulty = 'Beginner' | 'Intermediate' | 'Advanced' | 'default';
-type Language = 'JavaScript' | 'Python' | 'Java' | 'C++' | 'C#' | 'Go' | 'Ruby' | 'PHP' | 'Swift' | 'TypeScript' | 'default';
+type GameModes = string | 'difference' | 'fill' | 'default';
+type Difficulty = string | 'Beginner' | 'Intermediate' | 'Advanced' | 'default';
+type Language = string | 'JavaScript' | 'Python' | 'Java' | 'C++' | 'C#' | 'Go' | 'Ruby' | 'PHP' | 'Swift' | 'TypeScript' | 'default';
 
 interface ClientGameState {
     ready: boolean;
@@ -21,6 +21,7 @@ interface SocketRoom {
             in_progress: boolean;
             difficulty: Difficulty;
             language: Language;
+            questions: any[]; // array of questions
             client_state: {
                 [ws_id: string]: ClientGameState
             };

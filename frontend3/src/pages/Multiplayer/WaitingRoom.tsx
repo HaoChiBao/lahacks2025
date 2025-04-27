@@ -79,11 +79,13 @@ export default function WaitingRoom() {
   const [gameStartCountdown, setGameStartCountdown] = useState(0);
   const [finalGameSelection, setFinalGameSelection] = useState<finalGameSelection>({language: "", gameMode: "", difficulty: ""});
 
+  const [gameQuestions, setGameQuestions] = useState([]);
+
   // const [gameScore, setGameScore] = useState(0);
 
   useEffect(() => {
-    // const socket = new WebSocket(`ws:${import.meta.env.VITE_API_URL}`);
-    const socket = new WebSocket(`wss:${import.meta.env.VITE_API_URL}`);
+    const socket = new WebSocket(`ws:${import.meta.env.VITE_API_URL}`);
+    // const socket = new WebSocket(`wss:${import.meta.env.VITE_API_URL}`);
     const room_id = code;
 
     socket.onopen = () => {
@@ -107,6 +109,26 @@ export default function WaitingRoom() {
           setPlayers(current_players);
           setClientInfo(message.payload.clientInfo);
           setGameState(message.payload.gameState);
+
+          if ((message.payload.gameState.questions).length > 0) {
+            setGameQuestions(message.payload.gameState.questions);
+
+            setTimeout(() => {
+              setGameStartCountdown(3);
+      
+              const loop = setInterval(() => {
+                setGameStartCountdown((prev) => {
+                  if (prev <= 0) {
+                    clearInterval(loop);
+                    setStep(6);
+                    return 0;
+                  }
+                  return prev - 1;
+                });
+              }, 1000);
+            }, 500);
+          }
+          
           break;
         case "connected":
           setCurrentUserId(message.payload.id);
@@ -131,31 +153,16 @@ export default function WaitingRoom() {
     };
   }, [code, playerName]);
 
-  useEffect(() => {
-    if (step === 5) {
-      const gameMode = finalGameSelection?.gameMode || currentUserState.choices.gameMode;
-      const language = finalGameSelection?.language || currentUserState.choices.language;
-      const difficulty = finalGameSelection?.difficulty || currentUserState.choices.difficulty;
+  // useEffect(() => {
+  //   if (step === 5) {
+  //     const gameMode = finalGameSelection?.gameMode || currentUserState.choices.gameMode;
+  //     const language = finalGameSelection?.language || currentUserState.choices.language;
+  //     const difficulty = finalGameSelection?.difficulty || currentUserState.choices.difficulty;
 
-      console.log("Final Game Selection", gameMode, language, difficulty);
+  //     console.log("Final Game Selection", gameMode, language, difficulty);
 
-      setTimeout(() => {
-        setGameStartCountdown(5);
-
-        const loop = setInterval(() => {
-          setGameStartCountdown((prev) => {
-            if (prev <= 0) {
-              clearInterval(loop);
-              setStep(6);
-              return 0;
-            }
-            return prev - 1;
-          });
-        }, 1000);
-      }, 2000);
-
-    }
-  }, [step])
+  //   }
+  // }, [step])
 
   useEffect(() => {
     const counts = clientInfo;
@@ -466,7 +473,7 @@ export default function WaitingRoom() {
         {step === 6 && (
           <div className="max-w-2xl mx-auto">
             {/* <FillTheBlankGame setGameScore={setGameScore} /> */}
-            <FillTheBlankGame />
+            <FillTheBlankGame questions = {gameQuestions} />
           </div>
         )}
 

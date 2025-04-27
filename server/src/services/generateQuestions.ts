@@ -1,5 +1,7 @@
 import dotenv from "dotenv";
 
+import { GameModes, Difficulty, Language } from "../types/socket";
+
 dotenv.config();
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "";
@@ -12,7 +14,7 @@ interface GeneratedQuestion {
 
 const generateFillInTheBlank = async (
   language: string,
-  difficulty: "Beginner" | "Intermediate" | "Advanced",
+  difficulty: Difficulty,
   amount: number
 ): Promise<GeneratedQuestion[]> => {
   const prompt = `
