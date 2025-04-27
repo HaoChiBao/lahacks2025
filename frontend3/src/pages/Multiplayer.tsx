@@ -27,12 +27,15 @@ export default function MultiplayerPage() {
     if (!tempCode) return;
     setCreatedCode(tempCode); // finalize the code
     setGameModeSelect(false); // return to the "waiting for players" room screen
+    // navigate(`/multiplayer/room?code=${tempCode}`);
     navigate(`/multiplayer/room/${tempCode}`);
   }
 
   function joinRoom(mode:any) {
     if (!roomCode) return;
     navigate(`/multiplayer/room/${roomCode}?mode=${mode}`);
+    // navigate(`/multiplayer/room/${roomCode}`);
+    // navigate(`/multiplayer/room?code=${roomCode}`);
   }
 
   function copyCode() {

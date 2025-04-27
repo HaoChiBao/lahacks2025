@@ -22,7 +22,15 @@ function FloatingAnimal({ modelPath }: { modelPath: string }) {
 export default function AnimalFloat({ model = "/animals/Pudu_LOD_All.glb" }) {
   return (
     <div style={{ width: "250px", height: "250px", margin: "0 auto" }}>
-      <Canvas camera={{ position: [4, 2, 6], fov: 50 }}>
+      <Canvas
+        camera={{ position: [4, 2, 6], fov: 50 }}
+        onCreated={({ gl }) => {
+          gl.getContext().canvas.addEventListener("webglcontextlost", (event) => {
+            event.preventDefault();
+            console.warn("WebGL context lost. Please refresh the page.");
+          });
+        }}
+      >
         {/* Soft Lighting */}
         <ambientLight intensity={0.8} />
         <directionalLight position={[5, 5, 5]} intensity={1.2} />

@@ -22,6 +22,7 @@ class SocketRooms {
                 mode: 'default',
                 loop: this.roomLoop(room_id),
                 state: {
+                    questions: [],
                     in_progress: false,
                     difficulty: 'default', // Replace 'default' with a valid Difficulty value
                     language: 'default', // Replace 'default' with a valid Language value
@@ -108,6 +109,12 @@ class SocketRooms {
                             console.log("Client not open")
                         }
                     }
+
+                    generateFillInTheBlank(finalState.language, finalState.difficulty, 10)
+                    .then((questions) => {
+                        this.rooms[room_id].state.questions = questions
+                    })
+                    .catch((err) => {})
                 }
 
             }
