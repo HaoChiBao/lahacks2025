@@ -3,8 +3,8 @@ import dotenv from "dotenv";
 import { GameModes, Difficulty, Language } from "../types/socket";
 
 dotenv.config();
-const MODEL = "gemini-2.5-pro-exp-03-25";
-// const MODEL = "gemini-2.0-flash	";
+// const MODEL = "gemini-2.5-pro-exp-03-25";
+const MODEL = "gemini-2.0-flash	";
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "";
 
 interface GeneratedQuestion {
