@@ -50,46 +50,47 @@ export default function FillTheBlankGame({
   
 
   const handleOptionSelect = (option: string, optionIndex: number) => {
-  if (isSubmitted) return;
-
-  const availablePlaceholders = currentQuestion.code.match(/<option: \d+>/g) || [];
+    if (isSubmitted) return;
   
-  if (usedOptionIndexes.includes(optionIndex)) {
-    // Deselect this option
-    setSelectedAnswers((prev) => {
-      const newAnswers = { ...prev };
-      // Find which placeholder used this optionIndex
-      const placeholderToRemove = Object.entries(newAnswers).find(
-        ([placeholder, selectedOption]) => {
+    const availablePlaceholders = currentQuestion.code.match(/<option: \d+>/g) || [];
+  
+    if (usedOptionIndexes.includes(optionIndex)) {
+      // Deselect this option properly
+      setSelectedAnswers((prev) => {
+        const newAnswers = { ...prev };
+        const placeholderToRemove = Object.entries(prev).find(
+          ([placeholder, selectedOption]) => 
+          {
             console.log(placeholder)
-            shuffledOptions.indexOf(selectedOption) === optionIndex
+              selectedOption === option // Match option text (specific) to remove it
+          }
+        );
+        if (placeholderToRemove) {
+          const [placeholderKey] = placeholderToRemove;
+          delete newAnswers[placeholderKey];
         }
-      );
-      if (placeholderToRemove) {
-        delete newAnswers[placeholderToRemove[0]];
-      }
-      return newAnswers;
-    });
-
-    setUsedOptionIndexes((prev) => prev.filter((idx) => idx !== optionIndex));
-  } else {
-    // Select new option into the next available blank
-    const filledPlaceholders = Object.keys(selectedAnswers);
-    const nextPlaceholder = availablePlaceholders
-      .map(ph => ph.match(/\d+/)?.[0])
-      .find(number => !filledPlaceholders.includes(number!));
-
-    if (!nextPlaceholder) return;
-
-    setSelectedAnswers((prev) => ({
-      ...prev,
-      [nextPlaceholder]: option,
-    }));
-
-    setUsedOptionIndexes((prev) => [...prev, optionIndex]);
-  }
-};
-
+        return newAnswers;
+      });
+  
+      setUsedOptionIndexes((prev) => prev.filter((idx) => idx !== optionIndex));
+    } else {
+      // Select new option into the next available blank
+      const filledPlaceholders = Object.keys(selectedAnswers);
+      const nextPlaceholder = availablePlaceholders
+        .map(ph => ph.match(/\d+/)?.[0])
+        .find(number => !filledPlaceholders.includes(number!));
+  
+      if (!nextPlaceholder) return;
+  
+      setSelectedAnswers((prev) => ({
+        ...prev,
+        [nextPlaceholder]: option,
+      }));
+  
+      setUsedOptionIndexes((prev) => [...prev, optionIndex]);
+    }
+  };
+  
   
   const handleSubmit = () => {
     setIsSubmitted(true);

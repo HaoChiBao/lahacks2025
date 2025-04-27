@@ -18,6 +18,7 @@ const generateFillInTheBlank = async (
   difficulty: Difficulty,
   amount: number
 ): Promise<GeneratedQuestion[]> => {
+  
   const prompt = `
 You are creating content for a "Duolingo for coding" app that helps learners master programming through fill-in-the-blank exercises.
 
@@ -43,13 +44,16 @@ CODE REQUIREMENTS:
 - Maintain consistent coding style within each example
 
 PLACEHOLDER REQUIREMENTS:
-- Format all placeholders EXACTLY as <option: x> where x is the sequential number (1, 2, 3, etc.)
-- Ensure placeholders appear in numerical order (1, 2, 3...) throughout the code
+- Each code snippet MUST have BETWEEN 1-5 placeholders ONLY - NO MORE, NO LESS
+- Format all placeholders EXACTLY as <option: x> where x is a sequential number between 1 and 5
+- Placeholders must be numbered sequentially starting from 1 (e.g., <option: 1>, <option: 2>, etc.)
+- If a question has 3 placeholders, they must be <option: 1>, <option: 2>, and <option: 3>
 - Place placeholders at syntactically critical points that test understanding
-- Never use any other format besides <option: x> for placeholders
+- Never use any placeholder numbered higher than 5 (no <option: 6> or above)
 
 OPTION REQUIREMENTS:
-- The number of options MUST EXACTLY MATCH the number of placeholders in the code
+- The options array MUST contain EXACTLY the same number of options as placeholders in the code
+- For example: 3 placeholders = exactly 3 options, 5 placeholders = exactly 5 options
 - Provide options in the exact array order corresponding to their placeholder numbers
 - NO DUPLICATE OPTION NAMES - each option string must be unique within its question
 - Keep ALL options SHORT (1-3 words or symbols when possible, maximum 5 words)
@@ -66,19 +70,19 @@ DESCRIPTION REQUIREMENTS:
 
 DIFFICULTY-SPECIFIC REQUIREMENTS:
 ${difficulty === "Beginner" ? `
-- Include exactly 3-4 placeholders
+- Include 1-3 placeholders for beginner questions
 - Focus on: variables, data types, basic operators, simple functions, conditionals, loops, array basics
 - Keep code snippets short (5-12 lines)
 - Test fundamental syntax and programming concepts
 - Use simple, straightforward logic without nested structures
 ` : difficulty === "Intermediate" ? `
-- Include exactly 4-6 placeholders
+- Include 2-4 placeholders for intermediate questions
 - Focus on: array/object methods, error handling, classes, modules, callbacks, promises, DOM manipulation
 - Code snippets should be 8-20 lines
 - Test application of concepts in practical scenarios
 - Include at least one question involving debugging common errors
 ` : `
-- Include exactly 6-8 placeholders
+- Include 3-5 placeholders for advanced questions
 - Focus on: async/await, closures, recursion, higher-order functions, design patterns, optimization
 - Code snippets can be longer (15-30 lines)
 - Test deep understanding of advanced language features
@@ -112,7 +116,7 @@ QUESTION TYPES TO INCLUDE:
 - Error handling
 - Language-specific features
 
-EXAMPLE FORMAT:
+EXAMPLE FORMAT (with 2 placeholders):
 [
   {
     "code": "function <option: 1>(array) {\n  return array.<option: 2>((item) => item * 2);\n}",
@@ -122,9 +126,11 @@ EXAMPLE FORMAT:
 ]
 
 CRITICAL VALIDATION RULES:
-1. If there are N placeholders (<option: 1> through <option: N>), there MUST be EXACTLY N options in the options array
-2. All option strings must be unique - NO DUPLICATES allowed within a single question
-3. Options must match the expected length and format for their position in the code
+1. Each code snippet MUST have between 1-5 placeholders ONLY
+2. If there are N placeholders (<option: 1> through <option: N>), there MUST be EXACTLY N options in the options array
+3. All option strings must be unique - NO DUPLICATES allowed within a single question
+4. Options must match the expected length and format for their position in the code
+5. NO PLACEHOLDER can be numbered higher than 5 (nothing above <option: 5>)
 
 Generate diverse, educational examples that cover different aspects of ${language} programming at ${difficulty} level.
 `.trim();
