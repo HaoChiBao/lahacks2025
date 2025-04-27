@@ -6,6 +6,8 @@ import { Progress } from "../components/ui/progress";
 import { Badge } from "../components/ui/badge";
 import { codeSnippets } from "../lib/code-snippets";
 import AnimalFloat from "../components/HerringFloat";
+import { useNavigate } from "react-router-dom";
+
 
 const animalModel = "/animals/Sparrow_LOD_All.glb";
 
@@ -23,6 +25,8 @@ export default function SpotTheDifferenceGame({ mode = "single", playerName = "P
 
   const currentPuzzle = codeSnippets[currentLevel][currentSnippet];
   const totalDifferences = currentPuzzle.differences.length;
+  const navigate = useNavigate();
+
 
   useEffect(() => {
     if (!gameActive) return;
@@ -75,15 +79,17 @@ export default function SpotTheDifferenceGame({ mode = "single", playerName = "P
   };
 
   const handleNextPuzzle = () => {
-    if (mode === "single" && currentSnippet + 1 >= 3) {
-      endGame();
+    if (currentSnippet + 1 >= 3) {
+      // Finish the game
+      navigate(`/gameover?score=${score}&level=${currentLevel}&mode=single`);
     } else {
-      setCurrentSnippet((prev) => (prev + 1) % codeSnippets[currentLevel].length);
+      setCurrentSnippet(prev => prev + 1);
       setFoundDifferences([]);
       setShowExplanation(false);
       setTimeLeft(60);
     }
   };
+  
 
   const endGame = () => {
     setGameActive(false);
@@ -150,12 +156,11 @@ export default function SpotTheDifferenceGame({ mode = "single", playerName = "P
             <p className="text-gray-600">{currentPuzzle.explanation}</p>
 
             <Button
-              ref={nextPuzzleButtonRef} // Attach the ref to the button
-              className="mt-4 bg-blue-500 hover:bg-blue-600 text-white"
-              onClick={handleNextPuzzle}
-            >
-              Next Puzzle →
-            </Button>
+                className="mt-4 bg-blue-500 hover:bg-blue-600 text-white"
+                onClick={handleNextPuzzle}
+                >
+                {currentSnippet + 1 >= 3 ? "View Results →" : "Next Puzzle →"}
+                </Button>
           </div>
         </div>
       )}

@@ -7,6 +7,7 @@ import HowToPlayPage from "./pages/HowToPlay.jsx";
 import GameOverPage from "./pages/GameOver.jsx";
 import WaitingRoomPage from "./pages/Multiplayer/WaitingRoom.jsx"
 import RoomSpotDifference from "./pages/Multiplayer/RoomSpotDifference.jsx"; // ⭐ added Room game page separately
+import GlobalLeaderboard from "./pages/GlobalLeaderboard.jsx";
 
 
 function App() {
@@ -15,6 +16,8 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/game" element={<Game />} />
+        <Route path="/globalleaderboard" element={<GlobalLeaderboard />} />
+
         <Route path="/how-to-play" element={<HowToPlayPage />} />
         <Route path="/multiplayer" element={<MultiplayerPage />} />
         

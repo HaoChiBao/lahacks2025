@@ -19,7 +19,6 @@ export default function GameOverPage() {
   const correctAnswers = parseInt(searchParams.get("correct") || "0", 10);
   const totalQuestions = parseInt(searchParams.get("total") || "0", 10);
 
-  // Save to leaderboard
   useEffect(() => {
     if (score > 0) {
       const leaderboardData = JSON.parse(localStorage.getItem("codeSpotterLeaderboard") || "[]");
@@ -29,13 +28,11 @@ export default function GameOverPage() {
         level,
         date: new Date().toISOString(),
       });
-
       leaderboardData.sort((a, b) => b.score - a.score);
       localStorage.setItem("codeSpotterLeaderboard", JSON.stringify(leaderboardData.slice(0, 10)));
     }
   }, [score, level]);
 
-  // Trigger confetti on high score
   useEffect(() => {
     if (showConfetti && score > 100) {
       const duration = 3000;
@@ -54,7 +51,6 @@ export default function GameOverPage() {
         }
 
         const particleCount = 50 * (timeLeft / duration);
-
         confetti({
           ...defaults,
           particleCount,
@@ -89,77 +85,79 @@ export default function GameOverPage() {
   const accuracy = totalQuestions > 0 ? Math.round((correctAnswers / totalQuestions) * 100) : 0;
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-background to-muted p-4">
-      <Card className="max-w-md w-full">
-        <CardHeader className="text-center">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
-            <Trophy className="h-8 w-8 text-primary" />
-          </div>
-          <CardTitle className="text-2xl">Game Over!</CardTitle>
-          <CardDescription>Here's how you did</CardDescription>
-        </CardHeader>
-
-        <CardContent className="space-y-6">
-          <div className="flex flex-col items-center justify-center space-y-2">
-            <div className="text-4xl font-bold">{score}</div>
-            <p className="text-sm text-muted-foreground">Total Points</p>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="flex flex-col items-center justify-center rounded-lg border p-3">
-              <div className="text-xl font-semibold">{correctAnswers}</div>
-              <p className="text-xs text-muted-foreground">Questions Correct</p>
+    <div className="flex min-h-screen flex-col items-center justify-center bg-[#f9fafb] p-4">
+      <div className="w-full max-w-md">
+        <Card className="bg-white rounded-2xl shadow-lg p-6">
+          <CardHeader className="text-center space-y-2">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-blue-100">
+              <Trophy className="h-8 w-8 text-blue-500" />
             </div>
-            <div className="flex flex-col items-center justify-center rounded-lg border p-3">
-              <div className="text-xl font-semibold">{accuracy}%</div>
-              <p className="text-xs text-muted-foreground">Accuracy</p>
+            <CardTitle className="text-2xl font-bold text-gray-800">Game Over!</CardTitle>
+            <CardDescription className="text-gray-500">Here's how you did:</CardDescription>
+          </CardHeader>
+
+          <CardContent className="space-y-6">
+            <div className="flex flex-col items-center space-y-1">
+              <div className="text-4xl font-extrabold text-gray-900">{score}</div>
+              <p className="text-sm text-gray-500">Total Points</p>
             </div>
-          </div>
 
-          <div className="rounded-lg bg-muted p-4">
-            <p className="text-sm">{getPerformanceMessage()}</p>
-          </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex flex-col items-center rounded-lg bg-gray-100 p-4">
+                <div className="text-xl font-semibold text-gray-700">{correctAnswers}</div>
+                <p className="text-xs text-gray-500">Questions Correct</p>
+              </div>
+              <div className="flex flex-col items-center rounded-lg bg-gray-100 p-4">
+                <div className="text-xl font-semibold text-gray-700">{accuracy}%</div>
+                <p className="text-xs text-gray-500">Accuracy</p>
+              </div>
+            </div>
 
-          <div className="flex justify-center">
-            <Badge variant="outline" className="capitalize">
-              {level} level
-            </Badge>
-          </div>
-        </CardContent>
+            <div className="rounded-lg bg-gray-100 p-4 text-center">
+              <p className="text-sm text-gray-600">{getPerformanceMessage()}</p>
+            </div>
 
-        <CardFooter className="flex flex-col space-y-2">
-          <div className="grid w-full grid-cols-2 gap-2">
-            <Button onClick={handlePlayAgain} className="w-full">
-              <RotateCcw className="mr-2 h-4 w-4" />
-              Play Again
-            </Button>
-            <Link to="/" className="w-full">
-              <Button variant="outline" className="w-full">
-                <Home className="mr-2 h-4 w-4" />
-                Home
+            <div className="flex justify-center">
+              <Badge variant="outline" className="capitalize bg-blue-100 text-blue-700">
+                {level} Level
+              </Badge>
+            </div>
+          </CardContent>
+
+          <CardFooter className="flex flex-col space-y-3 mt-4">
+            <div className="grid w-full grid-cols-2 gap-2">
+              <Button onClick={handlePlayAgain} className="w-full">
+                <RotateCcw className="mr-2 h-4 w-4" />
+                Play Again
               </Button>
-            </Link>
-          </div>
+              <Link to="/" className="w-full">
+                <Button variant="outline" className="w-full">
+                  <Home className="mr-2 h-4 w-4" />
+                  Home
+                </Button>
+              </Link>
+            </div>
 
-          <Button
-            variant="ghost"
-            className="w-full"
-            onClick={() => {
-              navigator.clipboard.writeText(`I scored ${score} points in Code Difference Spotter!`);
-              alert("Score copied to clipboard!");
-            }}
-          >
-            <Share2 className="mr-2 h-4 w-4" />
-            Share Score
-          </Button>
+            <Button
+              variant="ghost"
+              className="w-full text-gray-600 hover:text-blue-500"
+              onClick={() => {
+                navigator.clipboard.writeText(`I scored ${score} points in Code Difference Spotter!`);
+                alert("Score copied to clipboard!");
+              }}
+            >
+              <Share2 className="mr-2 h-4 w-4" />
+              Share Score
+            </Button>
 
-          <div className="mt-2 text-center">
-            <Link to="/leaderboard" className="text-sm text-muted-foreground hover:underline">
-              View Global Leaderboard
-            </Link>
-          </div>
-        </CardFooter>
-      </Card>
+            <div className="mt-2 text-center">
+              <Link to="/globalleaderboard" className="text-sm text-blue-500 hover:underline">
+                View Global Leaderboard
+              </Link>
+            </div>
+          </CardFooter>
+        </Card>
+      </div>
     </div>
   );
 }
