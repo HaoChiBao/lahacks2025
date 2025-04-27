@@ -60,8 +60,10 @@ export default function FillTheBlankGame({
       const newAnswers = { ...prev };
       // Find which placeholder used this optionIndex
       const placeholderToRemove = Object.entries(newAnswers).find(
-        ([placeholder, selectedOption]) =>
-          shuffledOptions.indexOf(selectedOption) === optionIndex
+        ([placeholder, selectedOption]) => {
+            console.log(placeholder)
+            shuffledOptions.indexOf(selectedOption) === optionIndex
+        }
       );
       if (placeholderToRemove) {
         delete newAnswers[placeholderToRemove[0]];
