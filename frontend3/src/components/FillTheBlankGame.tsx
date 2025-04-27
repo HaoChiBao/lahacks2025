@@ -51,8 +51,8 @@ export default function FillTheBlankGame({
     }
   }, [currentQuestionIndex]);
 
-  const pruneExtraAnswers = (selected: Record<string, string>, availablePlaceholderCount: number) => {
-    const pruned: Record<string, string> = {};
+  const pruneExtraAnswers = (selected: Record<string, { option: string; optionIndex: number }>, availablePlaceholderCount: number) => {
+    const pruned: Record<string, { option: string; optionIndex: number }> = {};
   
     Object.entries(selected).forEach(([key, value]) => {
       const placeholderNumber = parseInt(key);
@@ -63,6 +63,7 @@ export default function FillTheBlankGame({
   
     return pruned;
   };
+  
   
   const handleOptionSelect = (option: string, optionIndex: number) => {
     if (isSubmitted) return;
@@ -112,7 +113,8 @@ export default function FillTheBlankGame({
     setSelectedAnswers((prev) => pruneExtraAnswers(prev, placeholderCount));
   
     const correct = Object.keys(selectedAnswers).filter(
-      (key) => selectedAnswers[key] === currentQuestion.options[Number(key) - 1]
+      (key) => selectedAnswers[key].option === currentQuestion.options[Number(key) - 1]
+
     ).length;
   
     setScore((prevScore) => prevScore + correct * 10);
@@ -136,12 +138,13 @@ export default function FillTheBlankGame({
     return currentQuestion.code.split("\n").map((line, index) => {
       const placeholders = line.match(/<option: \d+>/g) || [];
       let processedLine = line;
-
+  
       placeholders.forEach((placeholder) => {
         const placeholderNumber = placeholder.match(/\d+/)?.[0] || "";
-        const selectedOption = selectedAnswers[placeholderNumber] || "";
+        const selected = selectedAnswers[placeholderNumber];
+        const selectedOption = selected ? selected.option : "";
         const correctOption = currentQuestion.options[Number(placeholderNumber) - 1];
-
+  
         let className = "text-blue-500 border rounded px-1";
         if (isSubmitted) {
           if (selectedOption === correctOption) {
@@ -150,13 +153,13 @@ export default function FillTheBlankGame({
             className = "bg-red-200 text-red-800 border-red-500 rounded px-1";
           }
         }
-
+  
         processedLine = processedLine.replace(
           placeholder,
           `<span class="${className}">${selectedOption || "_____"}</span>`
         );
       });
-
+  
       return (
         <div
           key={index}
@@ -166,13 +169,14 @@ export default function FillTheBlankGame({
       );
     });
   };
+  
 
   const renderResults = () => {
     if (!isSubmitted) return null;
 
     const total = currentQuestion.options.length;
     const correct = Object.keys(selectedAnswers).filter(
-      (key) => selectedAnswers[key] === currentQuestion.options[Number(key) - 1]
+      (key) => selectedAnswers[key].option === currentQuestion.options[Number(key) - 1]
     ).length;
     const incorrect = total - correct;
     const percentage = (correct / total) * 100;
