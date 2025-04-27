@@ -38,6 +38,7 @@ export default function FillTheBlankGame({
 
   const [selectedAnswers, setSelectedAnswers] = useState<Record<string, { option: string; optionIndex: number }>>({});
 
+  const [currentPlaceholders, setCurrentPlaceholders] = useState(0);
 
   const currentQuestion = questions[currentQuestionIndex];
 
@@ -63,7 +64,6 @@ export default function FillTheBlankGame({
   
     return pruned;
   };
-  
   
   const handleOptionSelect = (option: string, optionIndex: number) => {
     if (isSubmitted) return;
@@ -104,8 +104,6 @@ export default function FillTheBlankGame({
     }
   };
   
-  
-  
   const handleSubmit = () => {
     setIsSubmitted(true);
   
@@ -144,6 +142,7 @@ export default function FillTheBlankGame({
       const placeholders = line.match(/<option: \d+>/g) || [];
       let processedLine = line;
   
+      setCurrentPlaceholders(placeholders.length);
       placeholders.forEach((placeholder) => {
         const placeholderNumber = placeholder.match(/\d+/)?.[0] || "";
         const selected = selectedAnswers[placeholderNumber];
@@ -213,7 +212,8 @@ export default function FillTheBlankGame({
                 : "text-red-800"
             }`}
           >
-            <span className="font-bold">Correct:</span> {correct} / {total} ({percentage.toFixed(1)}%)
+            {/* <span className="font-bold">Correct:</span> {correct} / {total} ({percentage.toFixed(1)}%) */}
+            <span className="font-bold">Correct:</span> {correct} / {currentPlaceholders} ({percentage.toFixed(1)}%)
           </p>
           <p
             className={`text-lg ${
