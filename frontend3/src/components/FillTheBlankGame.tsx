@@ -30,11 +30,14 @@ export default function FillTheBlankGame({
 }: FillTheBlankGameProps) {
   const navigate = useNavigate();
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [selectedAnswers, setSelectedAnswers] = useState<Record<string, string>>({});
+//   const [selectedAnswers, setSelectedAnswers] = useState<Record<string, string>>({});
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [shuffledOptions, setShuffledOptions] = useState<string[]>([]);
   const [usedOptionIndexes, setUsedOptionIndexes] = useState<number[]>([]);
   const nextQuestionRef = useRef<HTMLButtonElement>(null);
+
+  const [selectedAnswers, setSelectedAnswers] = useState<Record<string, { option: string; optionIndex: number }>>({});
+
 
   const currentQuestion = questions[currentQuestionIndex];
 
@@ -66,23 +69,22 @@ export default function FillTheBlankGame({
   
     const availablePlaceholders = currentQuestion.code.match(/<option: \d+>/g) || [];
   
-    if (usedOptionIndexes.includes(optionIndex)) {
-      // Deselect this option properly
+    // Check if the option is already used
+    const usedPlaceholder = Object.entries(selectedAnswers).find(
+      ([_, value]) => value.optionIndex === optionIndex
+    );
+  
+    if (usedPlaceholder) {
+      // Deselect
+      const placeholderKey = usedPlaceholder[0];
       setSelectedAnswers((prev) => {
         const newAnswers = { ...prev };
-        const placeholderToRemove = Object.entries(prev).find(
-          ([_, selectedOption]) => selectedOption === option
-        );
-        if (placeholderToRemove) {
-          const [placeholderKey] = placeholderToRemove;
-          delete newAnswers[placeholderKey];
-        }
+        delete newAnswers[placeholderKey];
         return newAnswers;
       });
-  
       setUsedOptionIndexes((prev) => prev.filter((idx) => idx !== optionIndex));
     } else {
-      // Select new option into the next available blank
+      // Find next empty placeholder
       const filledPlaceholders = Object.keys(selectedAnswers);
       const nextPlaceholder = availablePlaceholders
         .map(ph => ph.match(/\d+/)?.[0])
@@ -92,12 +94,12 @@ export default function FillTheBlankGame({
   
       setSelectedAnswers((prev) => ({
         ...prev,
-        [nextPlaceholder]: option,
+        [nextPlaceholder]: { option, optionIndex }
       }));
-  
       setUsedOptionIndexes((prev) => [...prev, optionIndex]);
     }
   };
+  
   
   
   const handleSubmit = () => {
