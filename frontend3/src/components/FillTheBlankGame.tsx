@@ -50,28 +50,45 @@ export default function FillTheBlankGame({
   
 
   const handleOptionSelect = (option: string, optionIndex: number) => {
-    if (isSubmitted) return;
+  if (isSubmitted) return;
+
+  const availablePlaceholders = currentQuestion.code.match(/<option: \d+>/g) || [];
   
-    const availablePlaceholders = currentQuestion.code.match(/<option: \d+>/g) || [];
+  if (usedOptionIndexes.includes(optionIndex)) {
+    // Deselect this option
+    setSelectedAnswers((prev) => {
+      const newAnswers = { ...prev };
+      // Find which placeholder used this optionIndex
+      const placeholderToRemove = Object.entries(newAnswers).find(
+        ([placeholder, selectedOption]) =>
+          shuffledOptions.indexOf(selectedOption) === optionIndex
+      );
+      if (placeholderToRemove) {
+        delete newAnswers[placeholderToRemove[0]];
+      }
+      return newAnswers;
+    });
+
+    setUsedOptionIndexes((prev) => prev.filter((idx) => idx !== optionIndex));
+  } else {
+    // Select new option into the next available blank
     const filledPlaceholders = Object.keys(selectedAnswers);
     const nextPlaceholder = availablePlaceholders
       .map(ph => ph.match(/\d+/)?.[0])
       .find(number => !filledPlaceholders.includes(number!));
-  
+
     if (!nextPlaceholder) return;
-  
-    if (usedOptionIndexes.includes(optionIndex)) return; // Already used this specific button
-  
+
     setSelectedAnswers((prev) => ({
       ...prev,
       [nextPlaceholder]: option,
     }));
-  
-    setUsedOptionIndexes((prev) => [...prev, optionIndex]);
-  };
-  
-  
 
+    setUsedOptionIndexes((prev) => [...prev, optionIndex]);
+  }
+};
+
+  
   const handleSubmit = () => {
     setIsSubmitted(true);
 
