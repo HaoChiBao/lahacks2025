@@ -36,4 +36,4 @@ interface WebSocketMessage {
     payload: any;
 }
 
-export {WebSocketMessage, SocketRoom};
+export {WebSocketMessage, SocketRoom, ClientGameState, GameModes, Difficulty, Language};

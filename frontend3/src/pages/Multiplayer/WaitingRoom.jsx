@@ -97,7 +97,7 @@ export default function WaitingRoom() {
       setStep(4);
     }
     if (step === 4 && counts.difficulty === counts.total) {
-      console.log("All players are ready. Starting the game...");
+      setStep(5);
     }
   }, [clientInfo]);
 
@@ -319,6 +319,19 @@ export default function WaitingRoom() {
                     </Button>
                   ))}
                 </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        { step === 5 && (
+          <div className="max-w-2xl mx-auto">
+            <Card className="bg-white shadow-md">
+              <CardHeader>
+                <CardTitle className="text-gray-700">Game Starting...</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <p className="text-gray-600">All players are ready. The game will start shortly!</p>
               </CardContent>
             </Card>
           </div>

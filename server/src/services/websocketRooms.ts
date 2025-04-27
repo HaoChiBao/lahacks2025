@@ -1,5 +1,7 @@
 import { SocketRoom } from "../types/socket"
 
+import { Difficulty, Language, GameModes } from "../types/socket"
+
 class SocketRooms {
     rooms: SocketRoom
     constructor() {
@@ -49,6 +51,50 @@ class SocketRooms {
                 }
             }
 
+            if (clientInfo.ready === clientInfo.total) {
+                this.rooms[room_id].state.in_progress = true
+            }
+
+            // check if clientInfo is all ready and difficulty, language, game mode are all chosen
+            if (clientInfo.ready === clientInfo.total && clientInfo.difficulty === clientInfo.total && clientInfo.language === clientInfo.total && clientInfo.gameMode === clientInfo.total) {
+                console.log("Game selection")
+
+                const clientStates = this.rooms[room_id].state.client_state;
+                const options = {
+                    difficulty: {},
+                    language: {},
+                    gameMode: {}
+                };
+
+                // Count occurrences of each choice
+                for (const ws in clientStates) {
+                    const choices = clientStates[ws].choices;
+                    options.difficulty[choices.difficulty] = (options.difficulty[choices.difficulty] || 0) + 1;
+                    options.language[choices.language] = (options.language[choices.language] || 0) + 1;
+                    options.gameMode[choices.gameMode] = (options.gameMode[choices.gameMode] || 0) + 1;
+                }
+
+                if (clientInfo.difficulty === clientInfo.total && clientInfo.language === clientInfo.total && clientInfo.gameMode === clientInfo.total) {
+                    
+                    // Helper function to determine the most selected option or break ties randomly
+                    const selectOption = (optionCounts: Record<string, number>) => {
+                        const maxCount = Math.max(...Object.values(optionCounts));
+                        const topOptions = Object.keys(optionCounts).filter(key => optionCounts[key] === maxCount);
+                        return topOptions[Math.floor(Math.random() * topOptions.length)];
+                    };
+    
+                    const finalState = {
+                        difficulty: selectOption(options.difficulty),
+                        language: selectOption(options.language),
+                        gameMode: selectOption(options.gameMode),
+                    };
+    
+                    this.rooms[room_id].state.difficulty = finalState.difficulty as Difficulty;
+                    this.rooms[room_id].state.language = finalState.language as Language;
+                    this.rooms[room_id].mode = finalState.gameMode as GameModes;
+                }
+
+            }
 
             console.log("Client Info", clientInfo)
 
@@ -90,6 +136,11 @@ class SocketRooms {
         if (!this.rooms[room_id]) {
             // create room if it doesn't exist
             room_id = this.createRoom(room_id)
+        } else {
+            // check if room is in progress
+            if (this.rooms[room_id].state.in_progress) {
+                return false
+            }
         }
         this.rooms[room_id].clients[ws.id] = ws
         this.rooms[room_id].state.client_state[ws.id] = {
