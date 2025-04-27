@@ -24,7 +24,7 @@ export default function WaitingRoom() {
   };
 
   const [players, setPlayers] = useState([]);
-  const [currentUserId, setCurrentUserId] = useState(null); // Current user's UID
+  const [currentUserId, setCurrentUserId] = useState(null);
   const [currentUserState, setCurrentUserState] = useState({
     ready: false,
     choices: {
@@ -32,26 +32,21 @@ export default function WaitingRoom() {
       difficulty: "default",
       language: "default",
     },
-  }); // Current user's state
+  });
+  const [gameState, setGameState] = useState({});
   const [step, setStep] = useState(1);
 
-  const [wss, setWss] = useState(null); // WebSocket connection
-  const [ws_connected, setWs_connected] = useState(false); // WebSocket connection status
-  const [clientInfo, setClientInfo] = useState({})
+  const [wss, setWss] = useState(null);
+  const [ws_connected, setWs_connected] = useState(false);
+  const [clientInfo, setClientInfo] = useState({});
 
   useEffect(() => {
-    console.log("Connecting to WebSocket server at:", import.meta.env.VITE_API_URL);
-    const socket = new WebSocket(`ws:${import.meta.env.VITE_API_URL}`); // Replace with your WebSocket URL
+    const socket = new WebSocket(`ws:${import.meta.env.VITE_API_URL}`);
+    const room_id = code;
 
-    const room_id = code; // Use the room ID from the URL
-
-    console.log("Joining room:", room_id);
     socket.onopen = () => {
-      console.log("Connected to WebSocket server");
       setWs_connected(true);
       setWss(socket);
-
-      // Join the room
       socket.send(
         JSON.stringify({
           type: "joinRoom",
@@ -62,27 +57,24 @@ export default function WaitingRoom() {
 
     socket.onmessage = (event) => {
       const message = JSON.parse(event.data);
-
       switch (message.type) {
         case "gameState":
           const current_players = message.payload?.gameState?.client_state
             ? Object.keys(message.payload.gameState.client_state)
             : [];
-          console.log("Current players:", current_players);
-          setPlayers(current_players); // Update players list
-          setClientInfo(message.payload.clientInfo); // Update client info
+          setPlayers(current_players);
+          setClientInfo(message.payload.clientInfo);
+          setGameState(message.payload.gameState);
           break;
         case "connected":
-          setCurrentUserId(message.payload.id); // Set the current user's UID
+          setCurrentUserId(message.payload.id);
           break;
         default:
-          console.warn("Unknown message type:", message.type);
           break;
       }
     };
 
     socket.onclose = () => {
-      console.log("Disconnected from WebSocket server");
       setWs_connected(false);
       setWss(null);
     };
@@ -93,8 +85,8 @@ export default function WaitingRoom() {
   }, [code, playerName]);
 
   useEffect(() => {
-    const counts = clientInfo
-  
+    const counts = clientInfo;
+
     if (step === 1 && counts.ready === counts.total && counts.total >= 2) {
       setStep(2);
     }
@@ -105,10 +97,7 @@ export default function WaitingRoom() {
       setStep(4);
     }
     if (step === 4 && counts.difficulty === counts.total) {
-
-      // startGame
       console.log("All players are ready. Starting the game...");
-
     }
   }, [clientInfo]);
 
@@ -141,51 +130,67 @@ export default function WaitingRoom() {
   );
 
   return (
-    <div className="flex flex-col min-h-screen bg-black text-white">
-      {/* Header */}
-      <header className="border-b border-gray-800 px-4 py-3 flex justify-between items-center">
+    <div className="flex flex-col min-h-screen bg-gray-100 text-gray-800">
+      <header className="border-b border-gray-300 px-4 py-3 flex justify-between items-center bg-white shadow-sm">
         <div className="flex items-center gap-3">
           <Link to="/multiplayer">
             <Button variant="ghost" size="icon">
-              <ArrowLeft className="h-5 w-5" />
+              <ArrowLeft className="h-5 w-5 text-gray-600" />
             </Button>
           </Link>
           <div className="flex items-center gap-2">
-            <h1 className="text-lg font-semibold">Room: {code}</h1>
-            <Button variant="outline" size="icon" onClick={copyCode} className="h-7 w-7 p-0">
+            <h1 className="text-lg font-semibold text-gray-700">Room: {code}</h1>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={copyCode}
+              className="h-7 w-7 p-0 bg-gray-200 text-gray-600"
+            >
               <Copy className="h-4 w-4" />
             </Button>
           </div>
         </div>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-1">
-            <Users className="h-5 w-5" />
+            <Users className="h-5 w-5 text-gray-600" />
             <span>{players.length}</span>
           </div>
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="flex-1 container mx-auto p-6">
         {step === 1 && (
           <div className="max-w-2xl mx-auto">
-            <Card>
+            <Card className="bg-white shadow-md">
               <CardHeader>
-                <CardTitle>Waiting Room</CardTitle>
+                <CardTitle className="text-gray-700">Waiting Room</CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div>
-                  <h3 className="text-lg font-medium mb-2">Players</h3>
+                  <h3 className="text-lg font-medium text-gray-700 mb-2">Players</h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {players.map((player) => (
                       <div
                         key={player}
                         className={`p-2 rounded ${
-                          player === currentUserId ? "bg-green-500 text-black" : ""
+                          player === currentUserId
+                            ? "bg-green-100 text-green-800"
+                            : "bg-gray-100 text-gray-700"
                         }`}
                       >
-                        <p className="flex items-center gap-2 text-sm font-medium">
+                        <p className="flex items-center justify-between text-sm font-medium">
                           {player}
+                          <span
+                            className={`${
+                              gameState?.client_state?.[player]?.ready
+                                ? "text-green-500"
+                                : "text-gray-500"
+                            }`}
+                          >
+                            {gameState?.client_state?.[player]?.ready
+                              ? "Ready"
+                              : "Waiting..."}
+                          </span>
                         </p>
                       </div>
                     ))}
@@ -193,7 +198,7 @@ export default function WaitingRoom() {
                 </div>
                 <Button
                   size="lg"
-                  className="w-full"
+                  className="w-full bg-blue-500 text-white"
                   onClick={() => {
                     updateUserState("ready", true);
                   }}
@@ -208,9 +213,9 @@ export default function WaitingRoom() {
 
         {step === 2 && (
           <div className="max-w-2xl mx-auto">
-            <Card>
+            <Card className="bg-white shadow-md">
               <CardHeader>
-                <CardTitle>Select Game Mode</CardTitle>
+                <CardTitle className="text-gray-700">Select Game Mode</CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="grid grid-cols-2 gap-4">
@@ -218,11 +223,20 @@ export default function WaitingRoom() {
                     <Button
                       key={mode}
                       onClick={() => updateUserState("gameMode", mode)}
-                      className={`${
-                        currentUserState.choices.gameMode === mode ? "bg-green-500" : ""
+                      className={`relative ${
+                        currentUserState.choices.gameMode === mode
+                          ? "bg-green-500 text-white"
+                          : "bg-gray-100 text-gray-700"
                       }`}
                     >
                       {mode}
+                      <span className="absolute -top-0 -right-0 bg-blue-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center transform translate-x-1/2 -translate-y-1/2">
+                        {
+                          Object.values(gameState?.client_state || {}).filter(
+                            (state) => state.choices?.gameMode === mode
+                          ).length
+                        }
+                      </span>
                     </Button>
                   ))}
                 </div>
@@ -233,9 +247,9 @@ export default function WaitingRoom() {
 
         {step === 3 && (
           <div className="max-w-2xl mx-auto">
-            <Card>
+            <Card className="bg-white shadow-md">
               <CardHeader>
-                <CardTitle>Select Language</CardTitle>
+                <CardTitle className="text-gray-700">Select Language</CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="grid grid-cols-2 gap-4">
@@ -254,11 +268,20 @@ export default function WaitingRoom() {
                     <Button
                       key={lang}
                       onClick={() => updateUserState("language", lang)}
-                      className={`${
-                        currentUserState.choices.language === lang ? "bg-green-500" : ""
+                      className={`relative ${
+                        currentUserState.choices.language === lang
+                          ? "bg-green-500 text-white"
+                          : "bg-gray-100 text-gray-700"
                       }`}
                     >
                       {lang}
+                      <span className="absolute -top-0 -right-0 bg-blue-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center transform translate-x-1/2 -translate-y-1/2">
+                        {
+                          Object.values(gameState?.client_state || {}).filter(
+                            (state) => state.choices?.language === lang
+                          ).length
+                        }
+                      </span>
                     </Button>
                   ))}
                 </div>
@@ -269,9 +292,9 @@ export default function WaitingRoom() {
 
         {step === 4 && (
           <div className="max-w-2xl mx-auto">
-            <Card>
+            <Card className="bg-white shadow-md">
               <CardHeader>
-                <CardTitle>Select Difficulty</CardTitle>
+                <CardTitle className="text-gray-700">Select Difficulty</CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="grid grid-cols-2 gap-4">
@@ -279,11 +302,20 @@ export default function WaitingRoom() {
                     <Button
                       key={level}
                       onClick={() => updateUserState("difficulty", level)}
-                      className={`${
-                        currentUserState.choices.difficulty === level ? "bg-green-500" : ""
+                      className={`relative ${
+                        currentUserState.choices.difficulty === level
+                          ? "bg-green-500 text-white"
+                          : "bg-gray-100 text-gray-700"
                       }`}
                     >
                       {level}
+                      <span className="absolute -top-0 -right-0 bg-blue-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center transform translate-x-1/2 -translate-y-1/2">
+                        {
+                          Object.values(gameState?.client_state || {}).filter(
+                            (state) => state.choices?.difficulty === level
+                          ).length
+                        }
+                      </span>
                     </Button>
                   ))}
                 </div>
@@ -293,7 +325,6 @@ export default function WaitingRoom() {
         )}
       </main>
 
-      {/* Connection Status */}
       <ConnectionStatus />
     </div>
   );

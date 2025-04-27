@@ -151,25 +151,49 @@ export default function FillTheBlankGame() {
         const percentage = (correct / total) * 100;
 
         return (
-            <div className="flex flex-col md:flex-row items-center justify-center gap-4 bg-white rounded-xl shadow-md p-4">
-            <div className="w-full md:w-1/3 flex justify-center">
-                <AnimalFloat model={animalModel} />
-            </div>
+            <div className="flex flex-col md:flex-row items-center justify-center gap-6 bg-white rounded-xl shadow-md p-6">
+                <div className="w-full md:w-1/3 flex justify-center">
+                    <AnimalFloat model={animalModel} />
+                </div>
 
-            <div className="w-full md:w-2/3 space-y-2 text-center md:text-left">
-                <h3 className={`text-2xl font-bold ${percentage === 100 ? "text-green-800" : percentage >= 50 ? "text-yellow-800" : "text-red-800"}`}>
-                🎉 Results
-                </h3>
-                <p className={`text-lg ${percentage === 100 ? "text-green-800" : percentage >= 50 ? "text-yellow-800" : "text-red-800"}`}>
-                <span className="font-bold">Correct:</span> {correct} / {total} ({percentage.toFixed(1)}%)
-                </p>
-                <p className={`text-lg ${percentage === 100 ? "text-green-800" : percentage >= 50 ? "text-yellow-800" : "text-red-800"}`}>
-                <span className="font-bold">Incorrect:</span> {incorrect}
-                </p>
-                
-                <h4 className="text-lg font-semibold text-gray-700">Description of what the code does:</h4>
-                <p className="text-gray-600">{currentQuestion.description}</p>
-            </div>
+                <div className="w-full md:w-2/3 space-y-4 text-center md:text-left">
+                    <h3 className={`text-2xl font-bold ${percentage === 100 ? "text-green-800" : percentage >= 50 ? "text-yellow-800" : "text-red-800"}`}>
+                        🎉 Results
+                    </h3>
+                    <p className={`text-lg ${percentage === 100 ? "text-green-800" : percentage >= 50 ? "text-yellow-800" : "text-red-800"}`}>
+                        <span className="font-bold">Correct:</span> {correct} / {total} ({percentage.toFixed(1)}%)
+                    </p>
+                    <p className={`text-lg ${percentage === 100 ? "text-green-800" : percentage >= 50 ? "text-yellow-800" : "text-red-800"}`}>
+                        <span className="font-bold">Incorrect:</span> {incorrect}
+                    </p>
+                    
+                    <p className="text-gray-600">{currentQuestion.description}</p>
+
+                    <div className="rounded-xl bg-gray-100 p-4 text-gray-800 overflow-auto">
+                        {currentQuestion.code.split("\n").map((line, index) => {
+                            const placeholders = line.match(/<option: \d+>/g) || [];
+                            let processedLine = line;
+
+                            placeholders.forEach((placeholder) => {
+                                const placeholderNumber = placeholder.match(/\d+/)[0];
+                                const correctOption = currentQuestion.options[placeholderNumber - 1];
+
+                                processedLine = processedLine.replace(
+                                    placeholder,
+                                    `<span class="bg-green-200 text-green-800 border-green-500 rounded px-1">${correctOption}</span>`
+                                );
+                            });
+
+                            return (
+                                <div
+                                    key={index}
+                                    className="font-mono text-sm text-gray-800 whitespace-pre-wrap"
+                                    dangerouslySetInnerHTML={{ __html: processedLine }}
+                                />
+                            );
+                        })}
+                    </div>
+                </div>
             </div>
         );
     };

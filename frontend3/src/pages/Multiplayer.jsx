@@ -39,6 +39,11 @@ export default function MultiplayerPage() {
     navigate(`/multiplayer/room/${tempCode}?name=${encodeURIComponent(playerName)}`);
   }
 
+  function joinRoom(mode) {
+    if (!roomCode || !playerName) return;
+    navigate(`/multiplayer/room/${roomCode}?name=${encodeURIComponent(playerName)}&mode=${mode}`);
+  }
+
   function copyCode() {
     navigator.clipboard.writeText(createdCode);
   }
@@ -101,7 +106,10 @@ export default function MultiplayerPage() {
                     </div>
                   </CardContent>
                   <CardFooter>
-                    <Button className="w-full bg-gray-100 text-gray-800 hover:bg-blue-500 hover:text-white rounded-xl">
+                    <Button
+                      className="w-full bg-gray-100 text-gray-800 hover:bg-blue-500 hover:text-white rounded-xl"
+                      onClick={() => joinRoom("default")}
+                    >
                       Join Game
                     </Button>
                   </CardFooter>
