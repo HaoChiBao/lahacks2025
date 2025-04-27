@@ -47,6 +47,20 @@ export default function FillTheBlankGame({
       setUsedOptionIndexes([]);
     }
   }, [currentQuestionIndex]);
+
+  const pruneExtraAnswers = (selected: Record<string, string>, availablePlaceholderCount: number) => {
+    const pruned: Record<string, string> = {};
+  
+    Object.entries(selected).forEach(([key, value]) => {
+      const placeholderNumber = parseInt(key);
+      if (placeholderNumber <= availablePlaceholderCount) {
+        pruned[key] = value;
+      }
+    });
+  
+    return pruned;
+  };
+  
   
 
   const handleOptionSelect = (option: string, optionIndex: number) => {
@@ -94,19 +108,25 @@ export default function FillTheBlankGame({
   
   const handleSubmit = () => {
     setIsSubmitted(true);
-
+  
+    const availablePlaceholders = currentQuestion.code.match(/<option: \d+>/g) || [];
+    const placeholderCount = availablePlaceholders.length;
+  
+    // 💥 Prune extra answers that don't have a placeholder
+    setSelectedAnswers((prev) => pruneExtraAnswers(prev, placeholderCount));
+  
     const correct = Object.keys(selectedAnswers).filter(
       (key) => selectedAnswers[key] === currentQuestion.options[Number(key) - 1]
     ).length;
-
+  
     setScore((prevScore) => prevScore + correct * 10);
     setQuestionsAnswered((prev) => prev + 1);
-
+  
     setTimeout(() => {
       nextQuestionRef.current?.scrollIntoView({ behavior: "smooth" });
     }, 300);
   };
-
+  
   const handleNextQuestion = () => {
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex((prev) => prev + 1);
